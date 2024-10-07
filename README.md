@@ -1,4 +1,4 @@
-  # Super Mario 64 Flying Simulator Rust
+  # Super Mario 64 Flying Simulator in Rust
 This is a WIP flying simulator for Super Mario 64, built in rust. Currently, there is very little functionality.
 
 
