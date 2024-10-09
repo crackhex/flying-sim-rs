@@ -1,5 +1,6 @@
-use crate::includes::trig_table::coss;
 use std::time::Instant;
+use crate::includes::trig_table::coss;
+
 #[test]
 fn test_trig() {
     let time = Instant::now();

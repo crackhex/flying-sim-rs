@@ -1,28 +1,34 @@
+use std::cmp::Ordering;
 use crate::includes::mario_state::MarioState;
 use crate::includes::trig_table::{approach_value, coss, sins};
 
 pub fn update_flying_yaw(m: &mut MarioState) {
+
     let target_yaw_vel: i16 = -((m.controller.stick_x * (m.forward_vel / 4.0)) as i16); // 0x4000
-    if target_yaw_vel > 0 {
-        if m.angle_vel[1] < 0 {
-            m.angle_vel[1] += 0x40;
-            if m.angle_vel[1] > 0x10 {
-                m.angle_vel[1] = 0x10;
+    match target_yaw_vel.cmp(&0i16) {
+        Ordering::Greater => {
+            if m.angle_vel[1] < 0 {
+                m.angle_vel[1] += 0x40;
+                if m.angle_vel[1] > 0x10 {
+                    m.angle_vel[1] = 0x10;
+                }
+            } else {
+                m.angle_vel[1] = approach_value(m.angle_vel[1] as i32, target_yaw_vel as i32, 0x10, 0x20) as i16;
             }
-        } else {
-            m.angle_vel[1] = approach_value(m.angle_vel[1] as i32, target_yaw_vel as i32, 0x10, 0x20) as i16;
         }
-    } else if target_yaw_vel < 0 {
-        if m.angle_vel[1] > 0 {
-            m.angle_vel[1] -= 0x40;
-            if m.angle_vel[1] < -0x10 {
-                m.angle_vel[1] = -0x10;
+        Ordering::Less => {
+            if m.angle_vel[1] > 0 {
+                m.angle_vel[1] -= 0x40;
+                if m.angle_vel[1] < -0x10 {
+                    m.angle_vel[1] = -0x10;
+                }
+            } else {
+                m.angle_vel[1] = approach_value(m.angle_vel[1] as i32, target_yaw_vel as i32, 0x20, 0x10) as i16;
             }
-        } else {
-            m.angle_vel[1] = approach_value(m.angle_vel[1] as i32, target_yaw_vel as i32, 0x20, 0x10) as i16;
         }
-    } else {
-        m.angle_vel[1] = approach_value(m.angle_vel[1] as i32, 0, 0x40, 0x40) as i16;
+        Ordering::Equal => {
+            m.angle_vel[1] = approach_value(m.angle_vel[1] as i32, 0, 0x40, 0x40) as i16;
+        }
     }
     m.face_angle[1] = m.face_angle[1].wrapping_add(m.angle_vel[1]);
     m.face_angle[2] = 20_i16.wrapping_mul(-m.angle_vel[1]);
@@ -30,26 +36,30 @@ pub fn update_flying_yaw(m: &mut MarioState) {
 
 pub fn update_flying_pitch(m: &mut MarioState) {
     let target_pitch_vel: i16 = -((m.controller.stick_y * (m.forward_vel / 5.0)) as i16); // 0x4000
-    if target_pitch_vel > 0 {
-        if m.angle_vel[0] < 0 {
-            m.angle_vel[0] += 0x40;
-            if m.angle_vel[0] > 0x20 {
-                m.angle_vel[0] = 0x20;
+    match target_pitch_vel.cmp(&0i16) {
+        Ordering::Greater => {
+            if m.angle_vel[0] < 0 {
+                m.angle_vel[0] += 0x40;
+                if m.angle_vel[0] > 0x20 {
+                    m.angle_vel[0] = 0x20;
+                }
+            } else {
+                m.angle_vel[0] = approach_value(m.angle_vel[0] as i32, target_pitch_vel as i32, 0x20, 0x40) as i16; // fix with approach_s32 function
             }
-        } else {
-            m.angle_vel[0] = approach_value(m.angle_vel[0] as i32, target_pitch_vel as i32, 0x20, 0x40) as i16; // fix with approach_s32 function
-        }
-    } else if target_pitch_vel < 0 {
-        if m.angle_vel[0] > 0 {
-            m.angle_vel[0] -= 0x40;
-            if m.angle_vel[0] < -0x20 {
-                m.angle_vel[0] = -0x20;
+        },
+        Ordering::Less => {
+            if m.angle_vel[0] > 0 {
+                m.angle_vel[0] -= 0x40;
+                if m.angle_vel[0] < -0x20 {
+                    m.angle_vel[0] = -0x20;
+                }
+            } else {
+                m.angle_vel[0] = approach_value(m.angle_vel[0] as i32, target_pitch_vel as i32, 0x40, 0x20) as i16; // fix with approach_s32 function
             }
-        } else {
-            m.angle_vel[0] = approach_value(m.angle_vel[0] as i32, target_pitch_vel as i32, 0x40, 0x20) as i16; // fix with approach_s32 function
-        }
-    } else {
-        m.angle_vel[1] = approach_value(m.angle_vel[0] as i32, 0, 0x40, 0x40) as i16; // fix with approach_s32 function
+        },
+        Ordering::Equal => {
+            m.angle_vel[1] = approach_value(m.angle_vel[0] as i32, 0, 0x40, 0x40) as i16; // fix with approach_s32 function
+        },
     }
 }
 

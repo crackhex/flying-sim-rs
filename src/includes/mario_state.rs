@@ -83,7 +83,8 @@ pub struct MarioState {
 
 impl MarioState {
     pub fn new() -> MarioState {
-        let mario_state = MarioState {
+        
+        MarioState {
             input: 0,
             flags: 0,
             action: 0,
@@ -108,8 +109,7 @@ impl MarioState {
             floor_angle: 0,
             controller: Controller::new(),
             num_coins: 0,
-        };
-        mario_state
+        }
     }
     pub fn update_state(&mut self, raw_x: i8, raw_y: i8) {
         self.controller.update_input(raw_x, raw_y);
