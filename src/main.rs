@@ -2,11 +2,14 @@
 
 mod includes;
 mod tests;
+mod simulations;
+
 use includes::mario_state::MarioState;
 
 fn main() {
     let mut mario_state = MarioState::new();
-    mario_state.update_state(127, 126);
-    mario_state.update_state(127,126);
+    mario_state.update_state(0, 0);
+    mario_state.update_state(0,0);
+    println!("{:?}", mario_state.forward_vel)
 
 }
