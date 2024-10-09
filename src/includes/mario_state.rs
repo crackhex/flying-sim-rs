@@ -1,4 +1,4 @@
-use crate::includes::flying_sim::{perform_air_step, update_air_without_turn, update_flying};
+use crate::includes::flying_sim::{perform_air_step, update_flying};
 
 pub struct Controller {
     raw_stick: RawStick,
@@ -114,7 +114,6 @@ impl MarioState {
     pub fn update_state(&mut self, raw_x: i8, raw_y: i8) {
         self.controller.update_input(raw_x, raw_y);
         println!("{}, {}", self.controller.stick_x, self.controller.stick_y);
-        update_air_without_turn(self);
         update_flying(self);
         perform_air_step(self);
         println!("{:?}", self.pos)

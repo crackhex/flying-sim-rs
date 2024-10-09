@@ -1,6 +1,7 @@
 use std::ops::{AddAssign, SubAssign};
 
-pub fn sins(x: u16) -> f32 {
+pub fn sins(x: i16) -> f32 {
+    let x = x.cast_unsigned();
     let div = x >> 4;
     if div > 0x400 && div <= 0x800 {
         return SIN_TABLE[(0x800 - div) as usize];
@@ -13,7 +14,8 @@ pub fn sins(x: u16) -> f32 {
     }
     SIN_TABLE[div as usize]
 }
-pub fn coss(x: u16) -> f32 {
+pub fn coss(x: i16) -> f32 {
+    let x = x.cast_unsigned();
     let div = x >> 4;
     if 0x400 < div && div <= 0x800 {
         return -SIN_TABLE[(div - 0x400) as usize];
@@ -49,6 +51,7 @@ pub fn approach_value<T: PartialOrd + AddAssign + SubAssign>(mut curr: T, target
     }
 }
 
+#[allow(clippy::excessive_precision)]
 const SIN_TABLE: [f32; 0x401] = [
 0.000000000, 0.0015339801,0.0030679568,0.004601926,
 0.0061358847,0.007669829, 0.009203754, 0.010737659,
