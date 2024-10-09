@@ -15,13 +15,13 @@ pub fn sins(x: u16) -> f32 {
 }
 pub fn coss(x: u16) -> f32 {
     let div = x >> 4;
-    if div > 0x400 && div <= 0x800 {
+    if 0x400 < div && div <= 0x800 {
         return -SIN_TABLE[(div - 0x400) as usize];
     }
-    if div > 0x800 && div <= 0xC00 {
+    if 0x800 < div && div <= 0xC00 {
         return -SIN_TABLE[(0xC00 - div) as usize];
     }
-    if div > 0xC00 && div <= 0x1000 {
+    if 0xC00 < div && div <= 0x1000 {
         return SIN_TABLE[(div - 0xC00) as usize];
     }
     SIN_TABLE[(0x400 - div) as usize]

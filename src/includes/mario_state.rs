@@ -1,19 +1,24 @@
 use crate::includes::flying_sim::{perform_air_step, update_air_without_turn, update_flying};
 
 pub struct Controller {
-    raw_stick_x: i16,              // 0x00
-    raw_stick_y: i16,              // 0x02
-    pub stick_x: f32,                 // 0x04
-    pub stick_y: f32,                 // 0x08
+    raw_stick: RawStick,
+    pub(crate) stick_x: f32,
+    pub(crate) stick_y: f32,
     stick_mag: f32,               // 0x0C
     button_down: u16,             // 0x10
     button_pressed: u16,          // 0x12
 }
+
+#[derive(Default)]
+struct RawStick {
+    x: i16,
+    y: i16,
+}
+
 impl Controller {
     pub fn new() -> Self {
         Controller {
-            raw_stick_x: 0,
-            raw_stick_y: 0,
+            raw_stick: RawStick::default(),
             stick_x: 0.0,
             stick_y: 0.0,
             stick_mag: 0.0,
@@ -22,21 +27,21 @@ impl Controller {
         }
     }
     pub fn update_input(&mut self, raw_x: i8, raw_y: i8) {
-        self.raw_stick_x = raw_x as i16;
-        self.raw_stick_y = raw_y as i16;
+        self.raw_stick.x = raw_x as i16;
+        self.raw_stick.y = raw_y as i16;
         self.stick_x = 0.0;
         self.stick_y = 0.0;
-        if self.raw_stick_x <= -8 {
-            self.stick_x = (self.raw_stick_x + 6) as f32;
+        if self.raw_stick.x <= -8 {
+            self.stick_x = (self.raw_stick.x + 6) as f32;
         }
-        if self.raw_stick_x >= 8 {
-            self.stick_x = (self.raw_stick_x - 6) as f32;
+        if self.raw_stick.x >= 8 {
+            self.stick_x = (self.raw_stick.x - 6) as f32;
         }
-        if self.raw_stick_y <= -8 {
-            self.stick_y = (self.raw_stick_y + 6) as f32;
+        if self.raw_stick.y <= -8 {
+            self.stick_y = (self.raw_stick.y + 6) as f32;
         }
-        if self.raw_stick_y >= 8 {
-            self.stick_y = (self.raw_stick_y - 6) as f32;
+        if self.raw_stick.y >= 8 {
+            self.stick_y = (self.raw_stick.y - 6) as f32;
         }
 
         self.stick_mag = (self.stick_x * self.stick_x + self.stick_y * self.stick_y).sqrt();
@@ -108,6 +113,7 @@ impl MarioState {
     }
     pub fn update_state(&mut self, raw_x: i8, raw_y: i8) {
         self.controller.update_input(raw_x, raw_y);
+        println!("{}, {}", self.controller.stick_x, self.controller.stick_y);
         update_air_without_turn(self);
         update_flying(self);
         perform_air_step(self);
