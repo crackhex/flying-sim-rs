@@ -1,9 +1,11 @@
+use serde::{Deserialize, Serialize};
 use crate::includes::mario_state::MarioState;
 
 pub trait Interact {
     fn dist_to_mario(&self, _: &MarioState) -> f32;
 }
-#[derive(Default)]
+
+#[derive(Default, Serialize, Deserialize)]
 pub struct Object {
     pub pos: [f32; 3],
     pub radius: f32,
@@ -22,6 +24,8 @@ impl Interact for Object {
         dist
     }
 }
+
+
 
 
 

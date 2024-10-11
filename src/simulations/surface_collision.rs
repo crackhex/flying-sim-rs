@@ -1,13 +1,18 @@
+use serde::{Deserialize, Serialize};
+
 const LEVEL_BOUNDARY_MAX: i32 = 8192;
 const CELL_SIZE: i32 = 0x400;
 const CELL_HEIGHT_LIMIT: i32 = 20000;
 const FLOOR_LOWER_LIMIT: i32 = -11000;
 
+#[derive(Default, Serialize, Deserialize)]
 pub struct SurfaceNormal {
     x: f32,
     y: f32,
     z: f32,
 }
+
+#[derive(Serialize, Deserialize, Default)]
 pub struct Surface {
     type_: i16,                  // 0x00
     force: i16,                  // 0x02

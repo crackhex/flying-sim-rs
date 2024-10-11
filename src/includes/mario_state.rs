@@ -1,11 +1,14 @@
 use std::sync::Arc;
+use serde::{Deserialize, Serialize};
 use crate::simulations::flying_sim::{update_flying, perform_air_step};
 use crate::simulations::object_collision::{Object, Interact};
+
 #[derive(Default)]
 struct ControllerRaw {
     x: i8,
     y: i8,
 }
+
 impl From<i16> for ControllerRaw {
     fn from(value: i16) -> Self {
         Self {
@@ -24,7 +27,7 @@ impl From<[i8; 2]> for ControllerRaw {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Serialize, Deserialize)]
 pub struct Controller {
     pub stick_x: f32,
     pub stick_y: f32,
@@ -32,7 +35,7 @@ pub struct Controller {
 }
 
 impl Controller {
-    pub fn update_joystick(&mut self, raw_stick: [i8; 2]) {
+    pub fn update_joystick<T: Into<ControllerRaw>>(&mut self, raw_stick: T) {
         let input: ControllerRaw = raw_stick.into();
         self.stick_x = 0.0;
         self.stick_y = 0.0;
@@ -50,6 +53,7 @@ impl Controller {
         }
 
         self.stick_mag = (self.stick_x * self.stick_x + self.stick_y * self.stick_y).sqrt();
+        println!("{}, {}", self.stick_x, self.stick_y);
         if self.stick_mag > 64.0 {
             self.stick_x *= 64.0 / self.stick_mag;
             self.stick_y *= 64.0 / self.stick_mag;
@@ -58,7 +62,7 @@ impl Controller {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Serialize, Deserialize)]
 pub struct MarioState {
     pub input: u16,                 // 0x02
     pub flags: u32,                 // 0x04
@@ -87,8 +91,8 @@ pub struct MarioState {
 }
 
 impl MarioState {
-    pub fn update_state(&mut self, raw_x: i8, raw_y: i8) {
-        self.controller.update_joystick([raw_x, raw_y]);
+    pub fn update_state<T: Into<ControllerRaw>>(&mut self, inputs: T) {
+        self.controller.update_joystick(inputs);
         println!("{}, {}", self.controller.stick_x, self.controller.stick_y);
         update_flying(self);
         perform_air_step(self);
