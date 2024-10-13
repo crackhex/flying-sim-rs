@@ -95,15 +95,18 @@ impl MarioState {
         perform_air_step(self);
         println!("{:?}", self.pos)
     }
-    pub fn closest_object_distance(&self, obj_list: &[Object]) -> f32 {
+
+    pub fn collect_closest_object(&self, mut obj_list: Vec<Object>) -> Vec<Object> {
         let mut smallest_dist: f32 = 1000.0;
-        let obj_index: u16 = 0;
-        obj_list.iter().for_each(|obj| {
-            let dist = obj.dist_to_mario(&self);
+        let mut obj_index: usize = 0;
+        for (i, obj) in obj_list.iter().enumerate() {
+            let dist = obj.dist_to_mario(self);
             if dist < smallest_dist {
                 smallest_dist = dist;
+                obj_index = i;
             }
-        });
-        smallest_dist
+        }
+        obj_list.remove(obj_index);
+        obj_list
     }
 }

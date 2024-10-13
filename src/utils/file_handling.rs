@@ -4,7 +4,7 @@ use std::path::{Path};
 use crate::includes::mario_state::MarioState;
 use crate::simulations::surface_collision::Surface;
 use crate::simulations::object_collision::Object;
-use serde::{Deserialize, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 use serde_json::Deserializer;
 use thiserror::Error;
 
