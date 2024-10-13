@@ -12,11 +12,7 @@ pub struct Object {
     pub target: u16,
     pub active: bool,
 }
-impl Object {
-    pub fn is_active(&self) -> bool {
-        self.active
-    }
-}
+
 impl Interact for Object {
     fn dist_to_mario(&self, m: &MarioState) -> f32 {
         let dist: f32 = ((self.pos[0] - m.pos[0])*(self.pos[0] - m.pos[0])

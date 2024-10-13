@@ -96,17 +96,18 @@ impl MarioState {
         println!("{:?}", self.pos)
     }
 
-    pub fn collect_closest_object(&self, mut obj_list: Vec<Object>) -> Vec<Object> {
+    pub fn collect_closest_object(&self, mut obj_list: &mut [Object]) {
         let mut smallest_dist: f32 = 1000.0;
         let mut obj_index: usize = 0;
         for (i, obj) in obj_list.iter().enumerate() {
-            let dist = obj.dist_to_mario(self);
-            if dist < smallest_dist {
-                smallest_dist = dist;
-                obj_index = i;
+            if obj.active {
+                let dist = obj.dist_to_mario(self);
+                if dist < smallest_dist {
+                    smallest_dist = dist;
+                    obj_index = i;
+                }
             }
         }
-        obj_list.remove(obj_index);
-        obj_list
+        obj_list[obj_index].active = false;
     }
 }
