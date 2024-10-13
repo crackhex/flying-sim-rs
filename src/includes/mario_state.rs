@@ -1,10 +1,9 @@
-use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 use crate::simulations::flying_sim::{update_flying, perform_air_step};
 use crate::simulations::object_collision::{Object, Interact};
 
 #[derive(Default)]
-struct ControllerRaw {
+pub struct ControllerRaw {
     x: i8,
     y: i8,
 }
@@ -53,7 +52,6 @@ impl Controller {
         }
 
         self.stick_mag = (self.stick_x * self.stick_x + self.stick_y * self.stick_y).sqrt();
-        println!("{}, {}", self.stick_x, self.stick_y);
         if self.stick_mag > 64.0 {
             self.stick_x *= 64.0 / self.stick_mag;
             self.stick_y *= 64.0 / self.stick_mag;
@@ -91,14 +89,13 @@ pub struct MarioState {
 }
 
 impl MarioState {
-    pub fn update_state<T: Into<ControllerRaw>>(&mut self, inputs: T) {
+    pub fn update_flying<T: Into<ControllerRaw>>(&mut self, inputs: T) {
         self.controller.update_joystick(inputs);
-        println!("{}, {}", self.controller.stick_x, self.controller.stick_y);
         update_flying(self);
         perform_air_step(self);
         println!("{:?}", self.pos)
     }
-    pub fn closest_object_distance(&self, obj_list: Arc<&[Object]>) -> f32 {
+    pub fn closest_object_distance(&self, obj_list: &[Object]) -> f32 {
         let mut smallest_dist: f32 = 1000.0;
         let obj_index: u16 = 0;
         obj_list.iter().for_each(|obj| {
