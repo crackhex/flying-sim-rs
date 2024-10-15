@@ -5,7 +5,7 @@ pub trait Interact {
     fn dist_to_mario(&self, _: &MarioState) -> f32;
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize, Debug)]
 pub struct Object {
     pub pos: [f32; 3],
     pub radius: f32,

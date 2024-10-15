@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 use crate::simulations::flying_sim::{update_flying, perform_air_step};
 use crate::simulations::object_collision::{Object, Interact};
@@ -7,18 +8,17 @@ pub struct ControllerRaw {
     x: i8,
     y: i8,
 }
-
-impl From<i16> for ControllerRaw {
-    fn from(value: i16) -> Self {
+impl From<&i16> for ControllerRaw {
+    fn from(value: &i16) -> Self {
         Self {
-            x: ((value >> 8) & 0xFF) as i8,
+            x: ((value >> 8i16) & 0xFF) as i8,
             y: (value & 0xFF) as i8,
         }
     }
 }
 
-impl From<[i8; 2]> for ControllerRaw {
-    fn from(values: [i8; 2]) -> Self {
+impl From<&[i8; 2]> for ControllerRaw {
+    fn from(values: &[i8; 2]) -> Self {
         Self {
             x: values[0],
             y: values[1],
@@ -34,7 +34,7 @@ pub struct Controller {
 }
 
 impl Controller {
-    pub fn update_joystick<T: Into<ControllerRaw>>(&mut self, raw_stick: T) {
+    pub fn update_joystick<T>(&mut self, raw_stick: &T) where ControllerRaw: for<'a> From<&'a T>{
         let input: ControllerRaw = raw_stick.into();
         self.stick_x = 0.0;
         self.stick_y = 0.0;
@@ -89,7 +89,9 @@ pub struct MarioState {
 }
 
 impl MarioState {
-    pub fn update_flying<T: Into<ControllerRaw>>(&mut self, inputs: T) {
+    pub fn update_flying<T>(&mut self, inputs: &T)
+    where ControllerRaw: for<'a> From<&'a T>
+    {
         self.controller.update_joystick(inputs);
         update_flying(self);
         perform_air_step(self);
@@ -109,5 +111,12 @@ impl MarioState {
             }
         }
         obj_list[obj_index].active = false;
+    }
+}
+
+pub fn simulate_inputs<T>(m: &mut MarioState, inputs: Arc<[T]>) where ControllerRaw: for<'a> From<&'a T> {
+    for input in inputs.iter() {
+        m.update_flying(input);
+        println!("{:?}", m.pos);
     }
 }
