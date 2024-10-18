@@ -26,7 +26,13 @@ impl From<&[i8; 2]> for ControllerRaw {
     }
 }
 
-#[derive(Default, Serialize, Deserialize)]
+pub fn pack_input(x: i8, y: i8) -> i16 {
+    ((x as i16) << 4) + (y as i16)
+}
+pub fn pack_input_u8(input: [u8; 2]) -> i16 {
+    ((input[0] as i16) << 4) + (input[1] as i16)
+}
+#[derive(Default, Serialize, Deserialize, Debug)]
 pub struct Controller {
     pub stick_x: f32,
     pub stick_y: f32,
@@ -34,21 +40,22 @@ pub struct Controller {
 }
 
 impl Controller {
-    pub fn update_joystick<T>(&mut self, raw_stick: &T) where ControllerRaw: for<'a> From<&'a T>{
-        let input: ControllerRaw = raw_stick.into();
+    pub fn update_joystick(&mut self, joystick: &i16) {
+        let x = ((joystick >> 8i16) & 0xFF) as i8;
+        let y = (joystick & 0xFF) as i8;
         self.stick_x = 0.0;
         self.stick_y = 0.0;
-        if input.x <= -8 {
-            self.stick_x = (input.x + 6) as f32;
+        if x <= -8 {
+            self.stick_x = (x + 6) as f32;
         }
-        if input.x >= 8 {
-            self.stick_x = (input.x - 6) as f32;
+        if x >= 8 {
+            self.stick_x = (x - 6) as f32;
         }
-        if input.y <= -8 {
-            self.stick_y = (input.x + 6) as f32;
+        if y <= -8 {
+            self.stick_y = (x + 6) as f32;
         }
-        if input.y >= 8 {
-            self.stick_y = (input.y - 6) as f32;
+        if y >= 8 {
+            self.stick_y = (y - 6) as f32;
         }
 
         self.stick_mag = (self.stick_x * self.stick_x + self.stick_y * self.stick_y).sqrt();
@@ -60,7 +67,7 @@ impl Controller {
     }
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize, Debug)]
 pub struct MarioState {
     pub input: u16,                 // 0x02
     pub flags: u32,                 // 0x04
@@ -89,8 +96,7 @@ pub struct MarioState {
 }
 
 impl MarioState {
-    pub fn update_flying<T>(&mut self, inputs: &T)
-    where ControllerRaw: for<'a> From<&'a T>
+    pub fn update_flying(&mut self, inputs: &i16)
     {
         self.controller.update_joystick(inputs);
         update_flying(self);
@@ -114,7 +120,7 @@ impl MarioState {
     }
 }
 
-pub fn simulate_inputs<T>(m: &mut MarioState, inputs: Arc<[T]>) where ControllerRaw: for<'a> From<&'a T> {
+pub fn simulate_inputs(m: &mut MarioState, inputs: Arc<[i16]>) {
     for input in inputs.iter() {
         m.update_flying(input);
         println!("{:?}", m.pos);
