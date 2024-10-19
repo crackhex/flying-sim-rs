@@ -3,34 +3,12 @@ use serde::{Deserialize, Serialize};
 use crate::simulations::flying_sim::{update_flying, perform_air_step};
 use crate::simulations::object_collision::{Object, Interact};
 
-#[derive(Default)]
-pub struct ControllerRaw {
-    x: i8,
-    y: i8,
-}
-impl From<&i16> for ControllerRaw {
-    fn from(value: &i16) -> Self {
-        Self {
-            x: ((value >> 8i16) & 0xFF) as i8,
-            y: (value & 0xFF) as i8,
-        }
-    }
-}
-
-impl From<&[i8; 2]> for ControllerRaw {
-    fn from(values: &[i8; 2]) -> Self {
-        Self {
-            x: values[0],
-            y: values[1],
-        }
-    }
-}
 
 pub fn pack_input(x: i8, y: i8) -> i16 {
-    ((x as i16) << 4) + (y as i16)
+    ((x as i16) << 8) + ((y as i16) & 255)
 }
 pub fn pack_input_u8(input: [u8; 2]) -> i16 {
-    ((input[0] as i16) << 4) + (input[1] as i16)
+    ((input[0] as i16) << 8) + (input[1] as i16)
 }
 #[derive(Default, Serialize, Deserialize, Debug)]
 pub struct Controller {
@@ -101,7 +79,7 @@ impl MarioState {
         self.controller.update_joystick(inputs);
         update_flying(self);
         perform_air_step(self);
-        println!("{:?}", self.pos)
+        //println!("{:?}", self.pos)
     }
 
     pub fn collect_closest_object(&self, mut obj_list: &mut [Object]) {
@@ -122,6 +100,7 @@ impl MarioState {
 
 pub fn simulate_inputs(m: &mut MarioState, inputs: Arc<[i16]>) {
     for input in inputs.iter() {
+
         m.update_flying(input);
         println!("{:?}", m.pos);
     }

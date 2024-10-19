@@ -7,7 +7,7 @@ fn test_trig() {
             array[i as usize] = coss(i);
         }
     );
-    println!("{:?}, {:?}", &array, &time.elapsed())
+    //println!("{:?}, {:?}", &array, &time.elapsed())
 }
 
 
