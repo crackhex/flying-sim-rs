@@ -29,5 +29,4 @@ pub fn update_air_without_turn(m: &mut MarioState) {
 
     m.vel[0] = m.slide_vel_x;
     m.vel[2] = m.slide_vel_z;
-
 }

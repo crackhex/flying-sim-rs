@@ -1,8 +1,7 @@
-use std::sync::Arc;
+use crate::simulations::flying_sim::{perform_air_step, update_flying};
+use crate::simulations::object_collision::{Interact, Object};
 use serde::{Deserialize, Serialize};
-use crate::simulations::flying_sim::{update_flying, perform_air_step};
-use crate::simulations::object_collision::{Object, Interact};
-
+use std::sync::Arc;
 
 pub fn pack_input(x: i8, y: i8) -> i16 {
     ((x as i16) << 8) + ((y as i16) & 255)
@@ -47,35 +46,34 @@ impl Controller {
 
 #[derive(Default, Serialize, Deserialize, Debug)]
 pub struct MarioState {
-    pub input: u16,                 // 0x02
-    pub flags: u32,                 // 0x04
-    pub action: u32,                // 0x0C
-    pub prev_action: u32,           // 0x10
-    action_state: u32,              // 0x18
-    action_timer: u16,              // 0x1A
-    action_arg: u32,                // 0x1C
-    pub intended_mag: f32,          // 0x1E
-    pub intended_yaw: i16,          // 0x22
-    pub frames_since_a: u8,         // 0x28
-    frames_since_b: u8,             // 0x29
-    pub face_angle: [i16; 3],       // 0x2C
-    pub angle_vel: [i16; 3],        // 0x32
-    slide_yaw: i16,                 // 0x38
-    pub pos: [f32; 3],              // 0x3C
-    pub vel: [f32; 3],              // 0x48
-    pub forward_vel: f32,           // 0x54
-    pub slide_vel_x: f32,           // 0x58
-    pub slide_vel_z: f32,           // 0x5C
-    ceil_height: f32,               // 0x6C
-    floor_height: f32,              // 0x70
-    floor_angle: i16,               // 0x74
-    pub controller: Controller,     // 0x78
-    num_coins: i16,                 // 0xA8
+    pub input: u16,             // 0x02
+    pub flags: u32,             // 0x04
+    pub action: u32,            // 0x0C
+    pub prev_action: u32,       // 0x10
+    action_state: u32,          // 0x18
+    action_timer: u16,          // 0x1A
+    action_arg: u32,            // 0x1C
+    pub intended_mag: f32,      // 0x1E
+    pub intended_yaw: i16,      // 0x22
+    pub frames_since_a: u8,     // 0x28
+    frames_since_b: u8,         // 0x29
+    pub face_angle: [i16; 3],   // 0x2C
+    pub angle_vel: [i16; 3],    // 0x32
+    slide_yaw: i16,             // 0x38
+    pub pos: [f32; 3],          // 0x3C
+    pub vel: [f32; 3],          // 0x48
+    pub forward_vel: f32,       // 0x54
+    pub slide_vel_x: f32,       // 0x58
+    pub slide_vel_z: f32,       // 0x5C
+    ceil_height: f32,           // 0x6C
+    floor_height: f32,          // 0x70
+    floor_angle: i16,           // 0x74
+    pub controller: Controller, // 0x78
+    num_coins: i16,             // 0xA8
 }
 
 impl MarioState {
-    pub fn update_flying(&mut self, inputs: &i16)
-    {
+    pub fn update_flying(&mut self, inputs: &i16) {
         self.controller.update_joystick(inputs);
         update_flying(self);
         perform_air_step(self);
@@ -100,7 +98,6 @@ impl MarioState {
 
 pub fn simulate_inputs(m: &mut MarioState, inputs: Arc<[i16]>) {
     for input in inputs.iter() {
-
         m.update_flying(input);
         println!("{:?}", m.pos);
     }

@@ -1,4 +1,4 @@
-use crate::includes::mario_state::{pack_input, simulate_inputs, MarioState};
+use crate::includes::mario_state::{MarioState, pack_input, simulate_inputs};
 use crate::simulations::object_collision::Object;
 use serde::{Deserialize, Serialize};
 use serde_json::Deserializer;
@@ -15,14 +15,12 @@ pub struct InputFile {
 }
 
 impl InputFile {
-    pub fn initial_mario_state(&self) {
-
-    }
+    pub fn initial_mario_state(&self) {}
     pub fn simulate(mut self) {
         let mario = &mut self.initial_state;
         let x = self.inputs;
         for i in x.iter() {
-            let x: i8  = ((i & -256 )>> 8) as i8;
+            let x: i8 = ((i & -256) >> 8) as i8;
             let y: i8 = (i << 8 >> 8) as i8;
             println!("{:?}, {:?}", x, y)
         }
@@ -58,7 +56,7 @@ pub struct DumpStruct {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DumpFile {
-    data: Vec<DumpStruct>
+    data: Vec<DumpStruct>,
 }
 
 #[derive(Debug, Error)]
@@ -68,7 +66,7 @@ pub enum InputFileError {
     #[error("Json cannot be deserialised")]
     JsonError(#[from] serde_json::Error),
     #[error("Error retrieving data")]
-    DataError
+    DataError,
 }
 
 impl DumpFile {
@@ -87,7 +85,11 @@ impl DumpFile {
         let data = &self.data;
         let first = data.first().ok_or(InputFileError::DataError)?;
         let mut initial_state = MarioState::default();
-        initial_state.pos = [first.memory.mario_x, first.memory.mario_y, first.memory.mario_z];
+        initial_state.pos = [
+            first.memory.mario_x,
+            first.memory.mario_y,
+            first.memory.mario_z,
+        ];
         let mut input_file = InputFile {
             initial_state,
             ..Default::default()

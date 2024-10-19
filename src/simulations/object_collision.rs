@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::includes::mario_state::MarioState;
+use serde::{Deserialize, Serialize};
 
 pub trait Interact {
     fn dist_to_mario(&self, _: &MarioState) -> f32;
@@ -15,14 +15,9 @@ pub struct Object {
 
 impl Interact for Object {
     fn dist_to_mario(&self, m: &MarioState) -> f32 {
-        let dist: f32 = ((self.pos[0] - m.pos[0])*(self.pos[0] - m.pos[0])
-            + (self.pos[2] - m.pos[2])*(self.pos[2] - m.pos[2])).sqrt();
+        let dist: f32 = ((self.pos[0] - m.pos[0]) * (self.pos[0] - m.pos[0])
+            + (self.pos[2] - m.pos[2]) * (self.pos[2] - m.pos[2]))
+            .sqrt();
         dist
     }
 }
-
-
-
-
-
-
