@@ -7,7 +7,7 @@ pub fn pack_input(x: i8, y: i8) -> i16 {
     ((x as i16) << 8) + ((y as i16) & 255)
 }
 pub fn pack_input_u8(input: [u8; 2]) -> i16 {
-    ((input[0] as i16) << 8) + (input[1] as i16)
+    ((input[0] as i16) << 8) + ((input[1] as i16) & 255)
 }
 #[derive(Default, Serialize, Deserialize, Debug)]
 pub struct Controller {
