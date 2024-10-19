@@ -15,6 +15,7 @@ jobs:
       matrix:
         toolchain:
           - nightly
+        components: [clippy, rustfmt]
     steps:
       - uses: actions/checkout@v4
       - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
