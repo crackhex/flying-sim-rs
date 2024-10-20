@@ -95,16 +95,11 @@ pub fn update_flying(m: &mut MarioState) {
 }
 
 pub fn perform_air_step(m: &mut MarioState) {
-    m.pos[0] += m.vel[0];
-    m.pos[1] += m.vel[1];
-    m.pos[2] += m.vel[2];
-    // TODO: Make this iterate quarter steps if collision is enabled
-    /*
     let mut intended_pos: [f32; 3] = [0.0, 0.0, 0.0];
     for _i in 0..4 {
         intended_pos[0] = m.pos[0] + (m.vel[0] / 4.0);
         intended_pos[1] = m.pos[1] + (m.vel[1] / 4.0);
         intended_pos[2] = m.pos[2] + (m.vel[2] / 4.0);
         m.pos = intended_pos;
-    }*/
+    }
 }
