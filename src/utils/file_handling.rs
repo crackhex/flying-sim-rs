@@ -1,4 +1,4 @@
-use crate::includes::mario_state::{MarioState, pack_input, simulate_inputs};
+use crate::includes::mario_state::{pack_input, MarioState};
 use crate::simulations::object_collision::Object;
 use serde::{Deserialize, Serialize};
 use serde_json::Deserializer;
@@ -12,19 +12,30 @@ pub struct InputFile {
     pub initial_state: MarioState,
     pub objects: Vec<Object>,
     pub inputs: Vec<i16>,
+    pub states: Vec<MarioState>,
 }
 
 impl InputFile {
     pub fn initial_mario_state(&self) {}
     pub fn simulate(mut self) {
-        let mario = &mut self.initial_state;
+        let m = &mut self.initial_state;
         let x = self.inputs;
-        for i in x.iter() {
-            let x: i8 = ((i & -256) >> 8) as i8;
-            let y: i8 = (i << 8 >> 8) as i8;
-            println!("{:?}, {:?}", x, y)
+        for (i, input) in x.iter().enumerate() {
+            m.update_flying(input);
+            if i < 20 {
+                println!(
+                    "{:?} {:?} {:?} {:?} {:?} {:?} {:?}",
+                    m.pos,
+                    m.face_angle[1],
+                    self.states[i + 1].pos,
+                    self.states[i + 1].face_angle[1],
+                    ((input >> 8i16) & 0xFF) as i8,
+                    (input & 0xFF) as i8,
+                    m.controller.stick_x
+                );
+            }
         }
-        simulate_inputs(mario, x.into());
+        //simulate_inputs(mario, x.into());
     }
 }
 #[derive(Serialize, Deserialize, Default, Debug)]
@@ -90,14 +101,25 @@ impl DumpFile {
             first.memory.mario_y,
             first.memory.mario_z,
         ];
+        initial_state.face_angle[1] = first.memory.mario_facing_yaw as i16;
+        initial_state.face_angle[0] = -1024;
         let mut input_file = InputFile {
             initial_state,
             ..Default::default()
         };
 
         for info in data.iter() {
+            let mut state = MarioState::default();
+            state.pos = [
+                info.memory.mario_x,
+                info.memory.mario_y,
+                info.memory.mario_z,
+            ];
+            state.face_angle[1] = info.memory.mario_facing_yaw.cast_signed();
             let input = pack_input(info.input.X, info.input.Y);
-            input_file.inputs.push(input)
+
+            input_file.inputs.push(input);
+            input_file.states.push(state);
         }
         Ok(input_file)
     }

@@ -29,7 +29,7 @@ impl Controller {
             self.stick_x = (x - 6) as f32;
         }
         if y <= -8 {
-            self.stick_y = (x + 6) as f32;
+            self.stick_y = (y + 6) as f32;
         }
         if y >= 8 {
             self.stick_y = (y - 6) as f32;
@@ -99,6 +99,5 @@ impl MarioState {
 pub fn simulate_inputs(m: &mut MarioState, inputs: Arc<[i16]>) {
     for input in inputs.iter() {
         m.update_flying(input);
-        println!("{:?}", m.pos);
     }
 }
