@@ -26,9 +26,9 @@ impl InputFile {
                 println!(
                     "{:?} {:?} {:?} {:?} {:?} {:?} {:?}",
                     m.pos,
-                    m.face_angle[1],
+                    m.face_angle[0],
                     self.states[i + 1].pos,
-                    self.states[i + 1].face_angle[1],
+                    self.states[i + 1].face_angle[0],
                     ((input >> 8i16) & 0xFF) as i8,
                     (input & 0xFF) as i8,
                     m.controller.stick_x
@@ -49,6 +49,7 @@ pub struct DumpMemory {
     mario_x_sliding_speed: f32,
     mario_z_sliding_speed: f32,
     mario_facing_yaw: u16,
+    mario_pitch: i16,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -102,7 +103,7 @@ impl DumpFile {
             first.memory.mario_z,
         ];
         initial_state.face_angle[1] = first.memory.mario_facing_yaw as i16;
-        initial_state.face_angle[0] = -1024;
+        initial_state.face_angle[0] = first.memory.mario_pitch;
         let mut input_file = InputFile {
             initial_state,
             ..Default::default()
@@ -116,6 +117,7 @@ impl DumpFile {
                 info.memory.mario_z,
             ];
             state.face_angle[1] = info.memory.mario_facing_yaw.cast_signed();
+            state.face_angle[0] = info.memory.mario_pitch;
             let input = pack_input(info.input.X, info.input.Y);
 
             input_file.inputs.push(input);

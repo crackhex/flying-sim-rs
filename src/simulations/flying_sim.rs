@@ -12,7 +12,7 @@ pub fn update_flying_yaw(m: &mut MarioState) {
                     m.angle_vel[1] = 0x10;
                 }
             } else {
-                m.angle_vel[1] = approach_value(m.angle_vel[1], target_yaw_vel, 0x10, 0x20) as i16; // why is this cast to i32 then i16
+                m.angle_vel[1] = approach_value(m.angle_vel[1] as i32, target_yaw_vel as i32, 0x10, 0x20) as i16; // why is this cast to i32 then i16
             }
         }
         Ordering::Less => {
@@ -86,6 +86,12 @@ pub fn update_flying(m: &mut MarioState) {
     }
     m.face_angle[0] = m.face_angle[0].wrapping_add(m.angle_vel[0]);
 
+    if m.face_angle[0] > 0x2AAA {
+        m.face_angle[0] = 0x2AAA;
+    }
+    if m.face_angle[0] < -0x2AAA {
+        m.face_angle[0] = -0x2AAA
+    }
     m.vel[0] = m.forward_vel * coss(m.face_angle[0]) * sins(m.face_angle[1]);
     m.vel[1] = m.forward_vel * sins(m.face_angle[0]);
     m.vel[2] = m.forward_vel * coss(m.face_angle[0]) * coss(m.face_angle[1]);
