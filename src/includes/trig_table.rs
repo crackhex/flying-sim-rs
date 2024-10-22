@@ -40,19 +40,14 @@ pub fn approach_value<T: PartialOrd + AddAssign + SubAssign>(
         curr += inc;
         if curr > target {
             curr = target;
-            curr
-        } else {
-            curr
         }
     } else {
         curr -= dec;
         if curr < target {
             curr = target;
-            curr
-        } else {
-            curr
         }
     }
+    curr
 }
 
 #[allow(clippy::excessive_precision)]

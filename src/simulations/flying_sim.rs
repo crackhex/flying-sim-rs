@@ -36,7 +36,7 @@ pub fn update_flying_yaw(m: &mut MarioState) {
 }
 
 pub fn update_flying_pitch(m: &mut MarioState) {
-    let target_pitch_vel: i16 = -((m.controller.stick_y * (m.forward_vel / 5.0)) as i16); // 0x4000
+    let target_pitch_vel: i16 = (-(m.controller.stick_y * (m.forward_vel / 5.0))) as i16;
     match target_pitch_vel.cmp(&0i16) {
         Ordering::Greater => {
             if m.angle_vel[0] < 0 {
@@ -46,8 +46,7 @@ pub fn update_flying_pitch(m: &mut MarioState) {
                 }
             } else {
                 m.angle_vel[0] =
-                    approach_value(m.angle_vel[0] as i32, target_pitch_vel as i32, 0x20, 0x40)
-                        as i16; // fix with approach_s32 function
+                    approach_value(m.angle_vel[0], target_pitch_vel, 0x20, 0x40)
             }
         }
         Ordering::Less => {
@@ -58,12 +57,11 @@ pub fn update_flying_pitch(m: &mut MarioState) {
                 }
             } else {
                 m.angle_vel[0] =
-                    approach_value(m.angle_vel[0] as i32, target_pitch_vel as i32, 0x40, 0x20)
-                        as i16; // fix with approach_s32 function
+                    approach_value(m.angle_vel[0], target_pitch_vel, 0x40, 0x20)
             }
         }
         Ordering::Equal => {
-            m.angle_vel[0] = approach_value(m.angle_vel[0] as i32, 0, 0x40, 0x40) as i16; // fix with approach_s32 function
+            m.angle_vel[0] = approach_value(m.angle_vel[0], 0, 0x40, 0x40);
         }
     }
 }
@@ -78,13 +76,13 @@ pub fn update_flying(m: &mut MarioState) {
     }
 
     if m.forward_vel > 16.0 {
-        m.face_angle[0] = m.face_angle[0].wrapping_add(((m.forward_vel - 32.0) * 6.0) as i16);
+        m.face_angle[0] += ((m.forward_vel - 32.0) * 6.0).ceil() as i16; // Investigate whether this is always true
     } else if m.forward_vel > 4.0 {
-        m.face_angle[0] = m.face_angle[0].wrapping_add(((m.forward_vel - 32.0) * 10.0) as i16);
+        m.face_angle[0] += ((m.forward_vel - 32.0) * 10.0) as i16; // Should this be ceil too?
     } else {
-        m.face_angle[0] = m.face_angle[0].wrapping_sub(0x400);
+        m.face_angle[0] -= 0x400;
     }
-    m.face_angle[0] = m.face_angle[0].wrapping_add(m.angle_vel[0]);
+    m.face_angle[0] += m.angle_vel[0];
 
     if m.face_angle[0] > 0x2AAA {
         m.face_angle[0] = 0x2AAA;
