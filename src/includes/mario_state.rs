@@ -72,10 +72,10 @@ impl MarioState {
         //println!("{:?}", self.pos)
     }
 
-    pub fn collect_closest_object<T: Interact>(&self, t: &mut Targets<T>) {
+    pub fn collect_closest_object(&self, t: &mut Targets) {
         let mut smallest_dist: f32 = 1000.0;
         let mut obj_index: usize = 0;
-        for (i, obj) in t.data.iter().enumerate() {
+        for (i, obj) in t.cylinder.iter().enumerate() {
             if obj.is_active() {
                 let dist = obj.horizontal_dist_to_mario(&self.pos);
                 if dist < smallest_dist {

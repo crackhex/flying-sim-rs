@@ -27,7 +27,7 @@ fn main() {
         height: 160,
     };
     let mut objects: Vec<CylinderHitbox> = vec![coin1];
-    let mut input_file: InputFile<CylinderHitbox> = x.parse_inputs().unwrap();
+    let mut input_file: InputFile = x.parse_inputs().unwrap();
     input_file.simulate();
     //println!("{:?}", &input_file.objects);
     //mario_state.collect_closest_object(&mut input_file.objects);

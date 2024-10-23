@@ -1,5 +1,5 @@
-use crate::includes::mario_state::{MarioState, pack_input};
-use crate::simulations::object_collision::{Interact, Targets};
+use crate::includes::mario_state::{pack_input, MarioState};
+use crate::simulations::object_collision::Targets;
 use serde::{Deserialize, Serialize};
 use serde_json::Deserializer;
 use std::fs::File;
@@ -8,20 +8,15 @@ use std::path::Path;
 use thiserror::Error;
 
 #[derive(Default, Serialize, Deserialize, Debug)]
-pub struct InputFile<T>
-where
-    T: Interact,
+pub struct InputFile
 {
     pub initial_state: MarioState,
-    pub objects: Targets<T>,
+    pub objects: Targets,
     pub inputs: Vec<i16>,
     pub states: Vec<MarioState>,
 }
 
-impl<T> InputFile<T>
-where
-    T: Interact,
-{
+impl InputFile {
     pub fn initial_mario_state(&self) {}
     pub fn simulate(mut self) {
         let m = &mut self.initial_state;
@@ -99,10 +94,7 @@ impl DumpFile {
         let x = serde_json::to_string(&self)?;
         Ok(file.write(x.as_bytes())?)
     }
-    pub fn parse_inputs<T>(&mut self) -> Result<InputFile<T>, InputFileError>
-    where
-        T: Interact + std::default::Default,
-    {
+    pub fn parse_inputs(&mut self) -> Result<InputFile, InputFileError> {
         let data = &self.data;
         let first = data.first().ok_or(InputFileError::DataError)?;
         let mut initial_state = MarioState::default();

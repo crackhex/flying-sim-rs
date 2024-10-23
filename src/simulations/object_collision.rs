@@ -1,4 +1,5 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
 
 pub trait Interact {
     fn is_active(&self) -> bool;
@@ -26,11 +27,10 @@ pub enum Hitboxes {
     Cuboid(CuboidHitbox),
 }
 #[derive(Default, Serialize, Deserialize, Debug)]
-pub struct Targets<T>
-where
-    T: Interact,
+pub struct Targets
 {
-    pub(crate) data: Vec<T>,
+    pub cuboid: Vec<CuboidHitbox>,
+    pub cylinder: Vec<CylinderHitbox>,
 }
 impl Interact for CylinderHitbox {
     fn is_active(&self) -> bool {
