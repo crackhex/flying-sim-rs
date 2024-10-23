@@ -1,5 +1,5 @@
-use crate::includes::mario_state::{pack_input, MarioState};
-use crate::simulations::object_collision::Object;
+use crate::includes::mario_state::{MarioState, pack_input};
+use crate::simulations::object_collision::{Interact, Targets};
 use serde::{Deserialize, Serialize};
 use serde_json::Deserializer;
 use std::fs::File;
@@ -7,22 +7,28 @@ use std::io::Write;
 use std::path::Path;
 use thiserror::Error;
 
-#[derive(Serialize, Deserialize, Default, Debug)]
-pub struct InputFile {
+#[derive(Default, Serialize, Deserialize, Debug)]
+pub struct InputFile<T>
+where
+    T: Interact,
+{
     pub initial_state: MarioState,
-    pub objects: Vec<Object>,
+    pub objects: Targets<T>,
     pub inputs: Vec<i16>,
     pub states: Vec<MarioState>,
 }
 
-impl InputFile {
+impl<T> InputFile<T>
+where
+    T: Interact,
+{
     pub fn initial_mario_state(&self) {}
     pub fn simulate(mut self) {
         let m = &mut self.initial_state;
         let x = self.inputs;
         for (i, input) in x.iter().enumerate() {
             m.update_flying(input);
-            if i < 20 {
+            if i < 400 {
                 println!(
                     "{:?} {:?} {:?} {:?} {:?} {:?} {:?}",
                     m.pos,
@@ -31,7 +37,7 @@ impl InputFile {
                     self.states[i + 1].face_angle[0],
                     ((input >> 8i16) & 0xFF) as i8,
                     (input & 0xFF) as i8,
-                    m.controller.stick_x
+                    m.angle_vel[0]
                 );
             }
         }
@@ -93,7 +99,10 @@ impl DumpFile {
         let x = serde_json::to_string(&self)?;
         Ok(file.write(x.as_bytes())?)
     }
-    pub fn parse_inputs(&mut self) -> Result<InputFile, InputFileError> {
+    pub fn parse_inputs<T>(&mut self) -> Result<InputFile<T>, InputFileError>
+    where
+        T: Interact + std::default::Default,
+    {
         let data = &self.data;
         let first = data.first().ok_or(InputFileError::DataError)?;
         let mut initial_state = MarioState::default();
@@ -102,7 +111,7 @@ impl DumpFile {
             first.memory.mario_y,
             first.memory.mario_z,
         ];
-        initial_state.face_angle[1] = first.memory.mario_facing_yaw as i16;
+        initial_state.face_angle[1] = first.memory.mario_facing_yaw.cast_signed();
         initial_state.face_angle[0] = first.memory.mario_pitch;
         let mut input_file = InputFile {
             initial_state,

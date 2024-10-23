@@ -1,5 +1,5 @@
 use crate::simulations::flying_sim::{perform_air_step, update_flying};
-use crate::simulations::object_collision::{Interact, Object};
+use crate::simulations::object_collision::{Interact, Targets};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -47,19 +47,12 @@ impl Controller {
 #[derive(Default, Serialize, Deserialize, Debug)]
 pub struct MarioState {
     pub input: u16,             // 0x02
-    pub flags: u32,             // 0x04
+    pub controller: Controller, // 0x78
     pub action: u32,            // 0x0C
-    pub prev_action: u32,       // 0x10
-    action_state: u32,          // 0x18
-    action_timer: u16,          // 0x1A
-    action_arg: u32,            // 0x1C
     pub intended_mag: f32,      // 0x1E
     pub intended_yaw: i16,      // 0x22
-    pub frames_since_a: u8,     // 0x28
-    frames_since_b: u8,         // 0x29
     pub face_angle: [i16; 3],   // 0x2C
     pub angle_vel: [i16; 3],    // 0x32
-    slide_yaw: i16,             // 0x38
     pub pos: [f32; 3],          // 0x3C
     pub vel: [f32; 3],          // 0x48
     pub forward_vel: f32,       // 0x54
@@ -68,7 +61,6 @@ pub struct MarioState {
     ceil_height: f32,           // 0x6C
     floor_height: f32,          // 0x70
     floor_angle: i16,           // 0x74
-    pub controller: Controller, // 0x78
     num_coins: i16,             // 0xA8
 }
 
@@ -80,19 +72,19 @@ impl MarioState {
         //println!("{:?}", self.pos)
     }
 
-    pub fn collect_closest_object(&self, mut obj_list: &mut [Object]) {
+    pub fn collect_closest_object<T: Interact>(&self, t: &mut Targets<T>) {
         let mut smallest_dist: f32 = 1000.0;
         let mut obj_index: usize = 0;
-        for (i, obj) in obj_list.iter().enumerate() {
-            if obj.active {
-                let dist = obj.dist_to_mario(self);
+        for (i, obj) in t.data.iter().enumerate() {
+            if obj.is_active() {
+                let dist = obj.horizontal_dist_to_mario(&self.pos);
                 if dist < smallest_dist {
                     smallest_dist = dist;
                     obj_index = i;
                 }
             }
+            //t.data[obj_index] = false;
         }
-        obj_list[obj_index].active = false;
     }
 }
 

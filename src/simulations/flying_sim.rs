@@ -12,7 +12,7 @@ pub fn update_flying_yaw(m: &mut MarioState) {
                     m.angle_vel[1] = 0x10;
                 }
             } else {
-                m.angle_vel[1] = approach_value(m.angle_vel[1] as i32, target_yaw_vel as i32, 0x10, 0x20) as i16; // why is this cast to i32 then i16
+                m.angle_vel[1] = approach_value(m.angle_vel[1], target_yaw_vel, 0x10, 0x20);
             }
         }
         Ordering::Less => {
@@ -22,12 +22,11 @@ pub fn update_flying_yaw(m: &mut MarioState) {
                     m.angle_vel[1] = -0x10;
                 }
             } else {
-                m.angle_vel[1] =
-                    approach_value(m.angle_vel[1] as i32, target_yaw_vel as i32, 0x20, 0x10) as i16;
+                m.angle_vel[1] = approach_value(m.angle_vel[1], target_yaw_vel, 0x20, 0x10);
             }
         }
         Ordering::Equal => {
-            m.angle_vel[1] = approach_value(m.angle_vel[1] as i32, 0, 0x40, 0x40) as i16;
+            m.angle_vel[1] = approach_value(m.angle_vel[1], 0, 0x40, 0x40);
         }
     }
 
@@ -45,8 +44,7 @@ pub fn update_flying_pitch(m: &mut MarioState) {
                     m.angle_vel[0] = 0x20;
                 }
             } else {
-                m.angle_vel[0] =
-                    approach_value(m.angle_vel[0], target_pitch_vel, 0x20, 0x40)
+                m.angle_vel[0] = approach_value(m.angle_vel[0], target_pitch_vel, 0x20, 0x40)
             }
         }
         Ordering::Less => {
@@ -56,8 +54,7 @@ pub fn update_flying_pitch(m: &mut MarioState) {
                     m.angle_vel[0] = -0x20;
                 }
             } else {
-                m.angle_vel[0] =
-                    approach_value(m.angle_vel[0], target_pitch_vel, 0x40, 0x20)
+                m.angle_vel[0] = approach_value(m.angle_vel[0], target_pitch_vel, 0x40, 0x20)
             }
         }
         Ordering::Equal => {
@@ -76,9 +73,9 @@ pub fn update_flying(m: &mut MarioState) {
     }
 
     if m.forward_vel > 16.0 {
-        m.face_angle[0] += ((m.forward_vel - 32.0) * 6.0).ceil() as i16; // Investigate whether this is always true
+        m.face_angle[0] = ((m.face_angle[0] as f32) + ((m.forward_vel - 32.0) * 6.0)) as i16; // Investigate whether this is always true
     } else if m.forward_vel > 4.0 {
-        m.face_angle[0] += ((m.forward_vel - 32.0) * 10.0) as i16; // Should this be ceil too?
+        m.face_angle[0] = ((m.face_angle[0] as f32) + ((m.forward_vel - 32.0) * 10.0)) as i16; // Should this be ceil too?
     } else {
         m.face_angle[0] -= 0x400;
     }
