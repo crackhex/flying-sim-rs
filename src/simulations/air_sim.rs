@@ -1,12 +1,12 @@
 use crate::includes::mario_state::MarioState;
-use crate::includes::trig_table::{approach_value, coss, sins};
+use crate::includes::trig_table::{approach_f32, coss, sins};
 
 pub fn update_air_without_turn(m: &mut MarioState) {
     let mut sideways_speed: f32 = 0.0;
     let mut intended_d_yaw: i16 = 0;
     let mut intended_mag: f32 = 0.0;
     let drag_threshold: f32 = 32.0; // not simulating long jump so 32.0f
-    m.forward_vel = approach_value(m.forward_vel, 0.0f32, 0.35f32, 0.35f32);
+    m.forward_vel = approach_f32(m.forward_vel, 0.0f32, 0.35f32, 0.35f32);
     if m.controller.stick_x != 0.0 && m.controller.stick_y != 0.0 {
         intended_d_yaw = m.intended_yaw - m.face_angle[1];
         intended_mag = m.intended_mag / 32.0;

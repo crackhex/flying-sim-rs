@@ -1,5 +1,5 @@
 use crate::includes::mario_state::MarioState;
-use crate::includes::trig_table::{approach_value, coss, sins};
+use crate::includes::trig_table::{approach_i16, coss, sins};
 use std::cmp::Ordering;
 
 pub fn update_flying_yaw(m: &mut MarioState) {
@@ -12,7 +12,7 @@ pub fn update_flying_yaw(m: &mut MarioState) {
                     m.angle_vel[1] = 0x10;
                 }
             } else {
-                m.angle_vel[1] = approach_value(m.angle_vel[1], target_yaw_vel, 0x10, 0x20);
+                m.angle_vel[1] = approach_i16(m.angle_vel[1], target_yaw_vel, 0x10, 0x20);
             }
         }
         Ordering::Less => {
@@ -22,11 +22,11 @@ pub fn update_flying_yaw(m: &mut MarioState) {
                     m.angle_vel[1] = -0x10;
                 }
             } else {
-                m.angle_vel[1] = approach_value(m.angle_vel[1], target_yaw_vel, 0x20, 0x10);
+                m.angle_vel[1] = approach_i16(m.angle_vel[1], target_yaw_vel, 0x20, 0x10);
             }
         }
         Ordering::Equal => {
-            m.angle_vel[1] = approach_value(m.angle_vel[1], 0, 0x40, 0x40);
+            m.angle_vel[1] = approach_i16(m.angle_vel[1], 0, 0x40, 0x40);
         }
     }
 
@@ -44,7 +44,7 @@ pub fn update_flying_pitch(m: &mut MarioState) {
                     m.angle_vel[0] = 0x20;
                 }
             } else {
-                m.angle_vel[0] = approach_value(m.angle_vel[0], target_pitch_vel, 0x20, 0x40)
+                m.angle_vel[0] = approach_i16(m.angle_vel[0], target_pitch_vel, 0x20, 0x40)
             }
         }
         Ordering::Less => {
@@ -54,11 +54,11 @@ pub fn update_flying_pitch(m: &mut MarioState) {
                     m.angle_vel[0] = -0x20;
                 }
             } else {
-                m.angle_vel[0] = approach_value(m.angle_vel[0], target_pitch_vel, 0x40, 0x20)
+                m.angle_vel[0] = approach_i16(m.angle_vel[0], target_pitch_vel, 0x40, 0x20)
             }
         }
         Ordering::Equal => {
-            m.angle_vel[0] = approach_value(m.angle_vel[0], 0, 0x40, 0x40);
+            m.angle_vel[0] = approach_i16(m.angle_vel[0], 0, 0x40, 0x40);
         }
     }
 }

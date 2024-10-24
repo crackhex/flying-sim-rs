@@ -30,12 +30,12 @@ pub const fn coss(x: i16) -> f32 {
     SIN_TABLE[(0x400 - div) as usize]
 }
 
-pub fn approach_value<T: PartialOrd + AddAssign + SubAssign>(
-    mut curr: T,
-    target: T,
-    inc: T,
-    dec: T,
-) -> T {
+pub const fn approach_i16(
+    mut curr: i16,
+    target: i16,
+    inc: i16,
+    dec: i16,
+) -> i16 {
     if curr < target {
         curr += inc;
         if curr > target {
@@ -49,6 +49,22 @@ pub fn approach_value<T: PartialOrd + AddAssign + SubAssign>(
     }
     curr
 }
+pub const fn approach_f32(mut curr: f32, target: f32, inc: f32, dec: f32) -> f32 {
+    if curr < target {
+        curr += inc;
+        if curr > target {
+            curr = target;
+        }
+    } else {
+        curr -= dec;
+        if curr < target {
+            curr = target;
+        }
+    }
+    curr
+}
+
+
 
 #[allow(clippy::excessive_precision)]
 const SIN_TABLE: [f32; 0x401] = [
