@@ -1,4 +1,4 @@
-use crate::includes::mario_state::{pack_input, MarioState};
+use crate::includes::mario_state::{MarioState, pack_input};
 use crate::simulations::object_collision::Targets;
 use serde::{Deserialize, Serialize};
 use serde_json::Deserializer;
@@ -8,8 +8,7 @@ use std::path::Path;
 use thiserror::Error;
 
 #[derive(Default, Serialize, Deserialize, Debug)]
-pub struct InputFile
-{
+pub struct InputFile {
     pub initial_state: MarioState,
     pub objects: Targets,
     pub inputs: Vec<i16>,

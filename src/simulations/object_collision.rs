@@ -1,5 +1,4 @@
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-
+use serde::{Deserialize, Serialize};
 
 pub trait Interact {
     fn is_active(&self) -> bool;
@@ -16,7 +15,7 @@ pub struct CylinderHitbox {
     pub target: u16,
     pub active: bool,
     pub height: u32,
-    pub order: u32,
+    pub index: u32,
 }
 #[derive(Default, Serialize, Deserialize, Debug)]
 pub struct CuboidHitbox {
@@ -24,15 +23,14 @@ pub struct CuboidHitbox {
     pub height: i32,
     pub minimum: i32,
     pub active: bool,
-    pub order: u32,
+    pub index: u32,
 }
 pub enum Hitboxes {
     Cylinder(CylinderHitbox),
     Cuboid(CuboidHitbox),
 }
 #[derive(Default, Serialize, Deserialize, Debug)]
-pub struct Targets
-{
+pub struct Targets {
     pub cuboid: Vec<CuboidHitbox>,
     pub cylinder: Vec<CylinderHitbox>,
 }
@@ -41,11 +39,7 @@ impl Interact for CylinderHitbox {
         self.active
     }
     fn is_in_horizontal_bounds(&self, mario_pos: [f32; 3]) -> bool {
-        if self.horizontal_dist_to_mario(mario_pos) < self.radius {
-            true
-        } else {
-            false
-        }
+        self.horizontal_dist_to_mario(mario_pos) < self.radius
     }
     fn is_in_vertical_bounds(&self, mario_pos: [f32; 3]) -> bool {
         todo!()
@@ -78,5 +72,4 @@ impl Interact for CuboidHitbox {
     fn vertical_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
         todo!()
     }
-
 }

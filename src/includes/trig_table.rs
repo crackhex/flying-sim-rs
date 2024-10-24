@@ -1,4 +1,3 @@
-
 pub const fn sins(x: i16) -> f32 {
     let x = x.cast_unsigned();
     let div = x >> 4;
@@ -29,12 +28,7 @@ pub const fn coss(x: i16) -> f32 {
     SIN_TABLE[(0x400 - div) as usize]
 }
 
-pub const fn approach_i16(
-    mut curr: i16,
-    target: i16,
-    inc: i16,
-    dec: i16,
-) -> i16 {
+pub const fn approach_i16(mut curr: i16, target: i16, inc: i16, dec: i16) -> i16 {
     if curr < target {
         curr += inc;
         if curr > target {
@@ -62,8 +56,6 @@ pub const fn approach_f32(mut curr: f32, target: f32, inc: f32, dec: f32) -> f32
     }
     curr
 }
-
-
 
 #[allow(clippy::excessive_precision)]
 const SIN_TABLE: [f32; 0x401] = [

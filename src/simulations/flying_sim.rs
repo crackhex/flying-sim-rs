@@ -81,12 +81,7 @@ pub fn update_flying(m: &mut MarioState) {
     }
     m.face_angle[0] += m.angle_vel[0];
 
-    if m.face_angle[0] > 0x2AAA {
-        m.face_angle[0] = 0x2AAA;
-    }
-    if m.face_angle[0] < -0x2AAA {
-        m.face_angle[0] = -0x2AAA
-    }
+    m.face_angle[0] = m.face_angle[0].clamp(-0x2AAA, 0x2AAA);
     m.vel[0] = m.forward_vel * coss(m.face_angle[0]) * sins(m.face_angle[1]);
     m.vel[1] = m.forward_vel * sins(m.face_angle[0]);
     m.vel[2] = m.forward_vel * coss(m.face_angle[0]) * coss(m.face_angle[1]);
