@@ -25,6 +25,7 @@ fn main() {
         target: 0,
         active: true,
         height: 160,
+        order: 0,
     };
     let mut objects: Vec<CylinderHitbox> = vec![coin1];
     let mut input_file: InputFile = x.parse_inputs().unwrap();
