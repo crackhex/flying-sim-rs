@@ -1,6 +1,12 @@
-use crate::includes::mario_state::{MarioState, simulate_inputs};
+use crate::includes::mario_state::MarioState;
 use crate::simulations::object_collision::{CylinderHitbox, Interact, Targets};
 
+pub struct Segment { // Dymamic dispatch for targets? Probably not a good idea for performance.
+    pub inputs: Vec<i16>,
+    pub initial_state: MarioState,
+    pub target: CylinderHitbox,
+    pub fitness: f32,
+}
 // Extremely basic fitness function
 // The target passed in here is the target mario is aiming for
 // The frame_count passed is the number of frames in the run
@@ -34,4 +40,8 @@ pub fn generate_targets(
         cuboid: vec![],
         cylinder: vec![],
     }
+}
+
+pub fn generate_segments(initial_state: &mut MarioState, inputs: &Vec<i16>, target: CylinderHitbox) {
+
 }

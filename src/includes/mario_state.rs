@@ -45,6 +45,8 @@ impl Controller {
     }
 }
 
+
+
 #[derive(Default, Serialize, Deserialize, Debug)]
 pub struct MarioState {
     pub input: u16,             // 0x02
