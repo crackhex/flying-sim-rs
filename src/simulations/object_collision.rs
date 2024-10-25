@@ -1,8 +1,8 @@
+use crate::utils::file_handling::InputFileError;
+use serde::{Deserialize, Serialize};
+use serde_json::Deserializer;
 use std::fs::File;
 use std::path::Path;
-use serde::{Deserialize, Serialize};
-use serde_json::{Deserializer, Serializer};
-use crate::utils::file_handling::InputFileError;
 
 pub trait Interact {
     fn is_active(&self) -> bool;
@@ -48,6 +48,7 @@ impl Targets {
         Ok(serde_json::to_writer(file, &self)?)
     }
 }
+
 impl Interact for CylinderHitbox {
     fn is_active(&self) -> bool {
         self.active

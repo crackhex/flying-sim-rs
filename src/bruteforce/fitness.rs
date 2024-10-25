@@ -1,7 +1,8 @@
 use crate::includes::mario_state::MarioState;
 use crate::simulations::object_collision::{CylinderHitbox, Interact, Targets};
 
-pub struct Segment { // Dymamic dispatch for targets? Probably not a good idea for performance.
+pub struct Segment {
+    // Dymamic dispatch for targets? Probably not a good idea for performance.
     pub inputs: Vec<i16>,
     pub initial_state: MarioState,
     pub target: CylinderHitbox,
@@ -27,21 +28,19 @@ pub fn final_target(targets: &Targets) -> Option<&CylinderHitbox> {
 
 pub fn generate_targets(
     initial_state: &mut MarioState,
-    inputs: &Vec<i16>,
+    inputs: &[i16],
     targets: &Targets,
     length: u32,
 ) -> Targets {
     let x = targets.cylinder.iter();
     let cylinders: Vec<CylinderHitbox> = vec![];
-    for (frame, input) in inputs.iter().enumerate() {
+    inputs.iter().enumerate().for_each(|(frame,input)| {
         if (frame as u32) < length {}
-    }
+    });
     Targets {
         cuboid: vec![],
         cylinder: vec![],
     }
 }
 
-pub fn generate_segments(initial_state: &mut MarioState, inputs: &Vec<i16>, target: CylinderHitbox) {
-
-}
+pub fn generate_segments(initial_state: &mut MarioState, inputs: &[i16], target: CylinderHitbox) {}

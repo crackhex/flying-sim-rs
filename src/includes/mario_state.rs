@@ -2,13 +2,16 @@ use crate::simulations::flying_sim::{perform_air_step, update_flying};
 use crate::simulations::object_collision::{Interact, Targets};
 use crate::utils::file_handling::InputFile;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 
-pub fn pack_input(x: i8, y: i8) -> i16 {
+pub const fn pack_input(x: i8, y: i8) -> i16 {
     ((x as i16) << 8) + ((y as i16) & 255)
 }
-pub fn pack_input_u8(input: [u8; 2]) -> i16 {
+pub const fn pack_input_u8(input: [u8; 2]) -> i16 {
     ((input[0] as i16) << 8) + ((input[1] as i16) & 255)
+}
+
+pub const fn unpack_input_i8(input: i16) -> [i8; 2] {
+    [((input >> 8i16) & 0xFF) as i8, (input & 0xFF) as i8]
 }
 #[derive(Default, Serialize, Deserialize, Debug)]
 pub struct Controller {
@@ -44,8 +47,6 @@ impl Controller {
         }
     }
 }
-
-
 
 #[derive(Default, Serialize, Deserialize, Debug)]
 pub struct MarioState {
@@ -91,10 +92,11 @@ impl MarioState {
     }
 }
 
-pub fn simulate_inputs(m: &mut MarioState, targets: &mut Targets, inputs: Arc<[i16]>) {
-    for input in inputs.iter() {
+pub fn simulate_inputs(m: &mut MarioState, targets: &mut Targets, inputs: &[i16]) {
+    inputs.iter().for_each(|input| {
         m.update_flying(input);
-    }
+        m.hit_closest_target(targets);
+    });
 }
 pub fn simulate(input_file: &mut InputFile) {
     let m = &mut input_file.initial_state;
@@ -103,7 +105,7 @@ pub fn simulate(input_file: &mut InputFile) {
     println!("{:?}", targets);
     for (i, input) in x.iter().enumerate() {
         m.update_flying(input);
-        m.hit_closest_target(&mut targets);
+        m.hit_closest_target(targets);
         if i < 400 {
             println!(
                 "{:?} {:?} {:?} {:?} {:?} {:?} {:?}",
