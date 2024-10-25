@@ -1,4 +1,8 @@
+use std::fs::File;
+use std::path::Path;
 use serde::{Deserialize, Serialize};
+use serde_json::{Deserializer, Serializer};
+use crate::utils::file_handling::InputFileError;
 
 pub trait Interact {
     fn is_active(&self) -> bool;
@@ -32,6 +36,17 @@ pub enum Hitboxes {
 pub struct Targets {
     pub cuboid: Vec<CuboidHitbox>,
     pub cylinder: Vec<CylinderHitbox>,
+}
+impl Targets {
+    pub fn read_file(path: &Path) -> Result<Targets, InputFileError> {
+        let file = File::open(path)?;
+        let mut de = Deserializer::from_reader(file);
+        Ok(Targets::deserialize(&mut de)?)
+    }
+    pub fn save_file(&self, path: &Path) -> Result<(), InputFileError> {
+        let mut file = File::create(path)?;
+        Ok(serde_json::to_writer(file, &self)?)
+    }
 }
 impl Interact for CylinderHitbox {
     fn is_active(&self) -> bool {

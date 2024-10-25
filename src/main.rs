@@ -12,8 +12,10 @@ use crate::utils::file_handling::{DumpFile, InputFile};
 use std::path::Path;
 
 fn main() {
-    let path: &Path = Path::new("Path\\To\\dump.json");
-    let mut dumpfile = DumpFile::read_file(path);
+    let dump_path: &Path = Path::new("Path\\To\\dump.json");
+    let target_path: &Path = Path::new("Path\\To\\targets.json");
+    let mut dumpfile = DumpFile::read_file(dump_path);
+
     let mut x = dumpfile.unwrap();
     let coin1 = CylinderHitbox {
         pos: [-3500.0, 0.0, 100.0],
@@ -37,4 +39,5 @@ fn main() {
     };
     input_file.targets = targets;
     simulate(&mut input_file);
+    input_file.targets.save_file(target_path).expect("TODO: panic message");
 }
