@@ -12,7 +12,6 @@ pub trait Interact {
 pub struct CylinderHitbox {
     pub pos: [f32; 3],
     pub radius: f32,
-    pub target: u16,
     pub active: bool,
     pub height: u32,
     pub index: u32,

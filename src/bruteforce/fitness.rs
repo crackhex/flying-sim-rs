@@ -1,4 +1,4 @@
-use crate::includes::mario_state::MarioState;
+use crate::includes::mario_state::{MarioState, simulate_inputs};
 use crate::simulations::object_collision::{CylinderHitbox, Interact, Targets};
 
 // Extremely basic fitness function
@@ -17,4 +17,21 @@ pub fn final_target(targets: &Targets) -> Option<&CylinderHitbox> {
         .cylinder
         .iter()
         .find(|&i| i.index.cmp(&final_index).is_eq())
+}
+
+pub fn generate_targets(
+    initial_state: &mut MarioState,
+    inputs: &Vec<i16>,
+    targets: &Targets,
+    length: u32,
+) -> Targets {
+    let x = targets.cylinder.iter();
+    let cylinders: Vec<CylinderHitbox> = vec![];
+    for (frame, input) in inputs.iter().enumerate() {
+        if (frame as u32) < length {}
+    }
+    Targets {
+        cuboid: vec![],
+        cylinder: vec![],
+    }
 }

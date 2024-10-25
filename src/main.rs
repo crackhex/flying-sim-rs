@@ -6,40 +6,35 @@ mod simulations;
 mod tests;
 mod utils;
 
-use crate::includes::mario_state::{pack_input_u8, simulate_inputs};
-use crate::simulations::object_collision::CylinderHitbox;
+use crate::includes::mario_state::simulate;
+use crate::simulations::object_collision::{CylinderHitbox, Targets};
 use crate::utils::file_handling::{DumpFile, InputFile};
-use includes::mario_state::MarioState;
 use std::path::Path;
-use std::sync::Arc;
 
 fn main() {
-    let path: &Path = Path::new("Path\\To\\File\\dump.json");
+    let path: &Path = Path::new("Path\\To\\dump.json");
     let mut dumpfile = DumpFile::read_file(path);
-    let mut mario_state = MarioState::default();
     let mut x = dumpfile.unwrap();
-    //println!("{:?}", x);
     let coin1 = CylinderHitbox {
-        pos: [10.0, 10.0, 10.0],
-        radius: 0.0,
-        target: 0,
+        pos: [-3500.0, 0.0, 100.0],
+        radius: 150.0,
         active: true,
         height: 160,
         index: 0,
     };
-    let mut objects: Vec<CylinderHitbox> = vec![coin1];
+    let coin2 = CylinderHitbox {
+        pos: [-3500.0, 0.0, -100.0],
+        radius: 150.0,
+        active: true,
+        height: 0,
+        index: 0,
+    };
+    let mut objects: Vec<CylinderHitbox> = vec![coin1, coin2];
     let mut input_file: InputFile = x.parse_inputs().unwrap();
-    input_file.simulate();
-    //println!("{:?}", &input_file.objects);
-    //mario_state.collect_closest_object(&mut input_file.objects);
-    //for obj in input_file.objects.iter() {
-    // println! {"{:?}", obj.active}
-    //}
-    let inputs: Arc<[i16]> = Arc::new([
-        pack_input_u8([0, 13]),
-        pack_input_u8([0, 13]),
-        pack_input_u8([0, 13]),
-        pack_input_u8([0, 13]),
-    ]);
-    simulate_inputs(&mut mario_state, inputs);
+    let mut targets = Targets {
+        cylinder: objects,
+        cuboid: vec![],
+    };
+    input_file.targets = targets;
+    simulate(&mut input_file);
 }

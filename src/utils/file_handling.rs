@@ -10,33 +10,19 @@ use thiserror::Error;
 #[derive(Default, Serialize, Deserialize, Debug)]
 pub struct InputFile {
     pub initial_state: MarioState,
-    pub objects: Targets,
+    pub targets: Targets,
     pub inputs: Vec<i16>,
     pub states: Vec<MarioState>,
 }
 
 impl InputFile {
-    pub fn initial_mario_state(&self) {}
-    pub fn simulate(mut self) {
-        let m = &mut self.initial_state;
-        let x = self.inputs;
-        for (i, input) in x.iter().enumerate() {
-            m.update_flying(input);
-            if i < 400 {
-                println!(
-                    "{:?} {:?} {:?} {:?} {:?} {:?} {:?}",
-                    m.pos,
-                    m.face_angle[0],
-                    self.states[i + 1].pos,
-                    self.states[i + 1].face_angle[0],
-                    ((input >> 8i16) & 0xFF) as i8,
-                    (input & 0xFF) as i8,
-                    m.angle_vel[0]
-                );
-            }
-        }
-        //simulate_inputs(mario, x.into());
+    pub fn read_file(&self, path: &Path) -> Result<InputFile, InputFileError> {
+        let file = File::open(path)?;
+        let mut de = Deserializer::from_reader(&file);
+
+        Ok(InputFile::deserialize(&mut de)?)
     }
+    pub fn initial_mario_state(&self) {}
 }
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct DumpMemory {

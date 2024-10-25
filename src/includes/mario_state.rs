@@ -1,5 +1,6 @@
 use crate::simulations::flying_sim::{perform_air_step, update_flying};
 use crate::simulations::object_collision::{Interact, Targets};
+use crate::utils::file_handling::InputFile;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -65,8 +66,8 @@ pub struct MarioState {
 }
 
 impl MarioState {
-    pub fn update_flying(&mut self, inputs: &i16) {
-        self.controller.update_joystick(inputs);
+    pub fn update_flying(&mut self, input: &i16) {
+        self.controller.update_joystick(input);
         update_flying(self);
         perform_air_step(self);
         //println!("{:?}", self.pos)
@@ -75,21 +76,45 @@ impl MarioState {
     pub fn hit_closest_target(&self, t: &mut Targets) {
         let mut smallest_dist: f32 = 1000.0;
         let mut obj_index: usize = 0;
-        for (i, obj) in t.cylinder.iter().enumerate() {
+        for (i, obj) in t.cylinder.iter_mut().enumerate() {
             if obj.is_active() {
                 let dist = obj.horizontal_dist_to_mario(self.pos);
                 if dist < smallest_dist {
                     smallest_dist = dist;
                     obj_index = i;
-                }
+                };
+                obj.active = false;
             }
-            //t.data[obj_index] = false;
         }
     }
 }
 
-pub fn simulate_inputs(m: &mut MarioState, inputs: Arc<[i16]>) {
+pub fn simulate_inputs(m: &mut MarioState, targets: &mut Targets, inputs: Arc<[i16]>) {
     for input in inputs.iter() {
         m.update_flying(input);
     }
+}
+pub fn simulate(input_file: &mut InputFile) {
+    let m = &mut input_file.initial_state;
+    let x = &*input_file.inputs;
+    let mut targets = &mut input_file.targets;
+    println!("{:?}", targets);
+    for (i, input) in x.iter().enumerate() {
+        m.update_flying(input);
+        m.hit_closest_target(&mut targets);
+        if i < 400 {
+            println!(
+                "{:?} {:?} {:?} {:?} {:?} {:?} {:?}",
+                m.pos,
+                m.face_angle[0],
+                input_file.states[i + 1].pos,
+                input_file.states[i + 1].face_angle[0],
+                ((input >> 8i16) & 0xFF) as i8,
+                (input & 0xFF) as i8,
+                m.angle_vel[0]
+            );
+        }
+    }
+    println! {"{:?}", targets}
+    //simulate_inputs(mario, x.into());
 }
