@@ -34,9 +34,10 @@ pub fn generate_targets(
 ) -> Targets {
     let x = targets.cylinder.iter();
     let cylinders: Vec<CylinderHitbox> = vec![];
-    inputs.iter().enumerate().for_each(|(frame,input)| {
-        if (frame as u32) < length {}
-    });
+    inputs
+        .iter()
+        .enumerate()
+        .for_each(|(frame, input)| if (frame as u32) < length {});
     Targets {
         cuboid: vec![],
         cylinder: vec![],

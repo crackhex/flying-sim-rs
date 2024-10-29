@@ -1,5 +1,5 @@
 use crate::simulations::flying_sim::{perform_air_step, update_flying};
-use crate::simulations::object_collision::{Interact, Targets};
+use crate::simulations::object_collision::{CylinderHitbox, Interact, Targets};
 use crate::utils::file_handling::InputFile;
 use serde::{Deserialize, Serialize};
 
@@ -13,7 +13,7 @@ pub const fn pack_input_u8(input: [u8; 2]) -> i16 {
 pub const fn unpack_input_i8(input: i16) -> [i8; 2] {
     [((input >> 8i16) & 0xFF) as i8, (input & 0xFF) as i8]
 }
-#[derive(Default, Serialize, Deserialize, Debug)]
+#[derive(Default, Serialize, Deserialize, Debug, Copy, Clone)]
 pub struct Controller {
     pub stick_x: f32,
     pub stick_y: f32,
@@ -48,7 +48,7 @@ impl Controller {
     }
 }
 
-#[derive(Default, Serialize, Deserialize, Debug)]
+#[derive(Default, Serialize, Deserialize, Debug, Copy, Clone)]
 pub struct MarioState {
     pub input: u16,             // 0x02
     pub controller: Controller, // 0x78
@@ -90,6 +90,13 @@ impl MarioState {
             }
         }
     }
+    pub fn hit_goal(&self, t: &CylinderHitbox) -> bool {
+        if t.horizontal_dist_to_mario(self.pos) < t.radius {
+            //println!("{:?}", t.horizontal_dist_to_mario(self.pos));
+            return true;
+        }
+        false
+    }
 }
 
 pub fn simulate_inputs(m: &mut MarioState, targets: &mut Targets, inputs: &[i16]) {
@@ -106,7 +113,7 @@ pub fn simulate(input_file: &mut InputFile) {
     for (i, input) in x.iter().enumerate() {
         m.update_flying(input);
         m.hit_closest_target(targets);
-        if i < 400 {
+        if i < x.len() - 1 {
             println!(
                 "{:?} {:?} {:?} {:?} {:?} {:?} {:?}",
                 m.pos,

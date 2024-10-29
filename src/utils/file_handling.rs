@@ -60,13 +60,12 @@ pub struct DumpFile {
 #[derive(Debug, Error)]
 pub enum InputFileError {
     #[error("File cannot be read")]
-    FileError(#[from] std::io::Error),
+    File(#[from] std::io::Error),
     #[error("Json cannot be deserialised")]
-    JsonError(#[from] serde_json::Error),
+    Json(#[from] serde_json::Error),
     #[error("Error retrieving data")]
-    DataError,
+    Data,
 }
-
 impl DumpFile {
     pub fn read_file(path_buf: &Path) -> Result<DumpFile, InputFileError> {
         let file = File::open(path_buf)?;
@@ -81,7 +80,7 @@ impl DumpFile {
     }
     pub fn parse_inputs(&mut self) -> Result<InputFile, InputFileError> {
         let data = &self.data;
-        let first = data.first().ok_or(InputFileError::DataError)?;
+        let first = data.first().ok_or(InputFileError::Data)?;
         let mut initial_state = MarioState::default();
         initial_state.pos = [
             first.memory.mario_x,
@@ -95,7 +94,7 @@ impl DumpFile {
             ..Default::default()
         };
 
-        for info in data.iter() {
+        data.iter().for_each(|info| {
             let mut state = MarioState::default();
             state.pos = [
                 info.memory.mario_x,
@@ -105,10 +104,9 @@ impl DumpFile {
             state.face_angle[1] = info.memory.mario_facing_yaw.cast_signed();
             state.face_angle[0] = info.memory.mario_pitch;
             let input = pack_input(info.input.X, info.input.Y);
-
             input_file.inputs.push(input);
             input_file.states.push(state);
-        }
+        });
         Ok(input_file)
     }
 }
