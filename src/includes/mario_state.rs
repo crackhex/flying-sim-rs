@@ -1,5 +1,5 @@
 use crate::simulations::flying_sim::{perform_air_step, update_flying};
-use crate::simulations::object_collision::{CylinderHitbox, Interact, Targets};
+use crate::simulations::object_collision::{Interact, Targets};
 use crate::utils::file_handling::InputFile;
 use serde::{Deserialize, Serialize};
 
@@ -86,8 +86,8 @@ impl MarioState {
             }
         });
     }
-    pub fn hit_goal(&self, t: &CylinderHitbox) -> bool {
-        if t.horizontal_dist_to_mario(self.pos) < t.radius {
+    pub fn hit_goal(&self, t: impl Interact ) -> bool {
+        if t.is_in_horizontal_bounds(self.pos) && t.is_in_vertical_bounds(self.pos)  {
             //println!("{:?}", t.horizontal_dist_to_mario(self.pos));
             return true;
         }

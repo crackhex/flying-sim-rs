@@ -44,9 +44,23 @@ impl Targets {
         Ok(Targets::deserialize(&mut de)?)
     }
     pub fn save_file(&self, path: &Path) -> Result<(), InputFileError> {
-        let mut file = File::create(path)?;
+        let file = File::create(path)?;
         Ok(serde_json::to_writer(file, &self)?)
     }
+    pub fn all_targets_inactive(&self) -> bool {
+        for hitbox in self.cuboid.iter() {
+            if hitbox.is_active() {
+                return false;
+            }
+        }
+        for hitbox in self.cylinder.iter() {
+            if hitbox.is_active() {
+                return false;
+            }
+        }
+        true
+    }
+    
 }
 
 impl Interact for CylinderHitbox {
@@ -78,8 +92,12 @@ impl Interact for &CylinderHitbox {
     fn is_in_horizontal_bounds(&self, mario_pos: [f32; 3]) -> bool {
         self.horizontal_dist_to_mario(mario_pos) < self.radius
     }
-    fn is_in_vertical_bounds(&self, mario_pos: [f32; 3]) -> bool {
-        todo!()
+    fn is_in_vertical_bounds(&self, mario_pos: [f32; 3]) -> bool { 
+        /*if self.pos[1] < mario_pos[1] {
+           return true;
+        };
+        false*/
+        true
     }
 
     fn horizontal_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
@@ -89,7 +107,7 @@ impl Interact for &CylinderHitbox {
         dist
     }
     fn vertical_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
-        todo!()
+        (self.pos[1] - mario_pos[1]).abs()
     }
 }
 
