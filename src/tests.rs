@@ -12,4 +12,3 @@ mod tests {
         println!("{:?}, {:?}", &array, &time.elapsed())
     }
 }
-

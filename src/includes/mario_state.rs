@@ -77,18 +77,14 @@ impl MarioState {
     }
 
     pub fn hit_closest_target(&self, t: &mut Targets) {
-        let mut smallest_dist: f32 = 1000.0;
-        let mut obj_index: usize = 0;
-        for (i, obj) in t.cylinder.iter_mut().enumerate() {
+        t.cylinder.iter_mut().for_each(|obj| {
             if obj.is_active() {
                 let dist = obj.horizontal_dist_to_mario(self.pos);
-                if dist < smallest_dist {
-                    smallest_dist = dist;
-                    obj_index = i;
-                };
-                obj.active = false;
+                if dist < obj.radius {
+                    obj.active = false;
+                }
             }
-        }
+        });
     }
     pub fn hit_goal(&self, t: &CylinderHitbox) -> bool {
         if t.horizontal_dist_to_mario(self.pos) < t.radius {

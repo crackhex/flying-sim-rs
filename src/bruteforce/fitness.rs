@@ -11,9 +11,20 @@ pub struct Segment {
 // Extremely basic fitness function
 // The target passed in here is the target mario is aiming for
 // The frame_count passed is the number of frames in the run
-pub fn calculate_fitness(m: &MarioState, target: impl Interact, frame_count: usize) -> f32 {
-    let dist = target.horizontal_dist_to_mario(m.pos);
-    let fitness = (frame_count as f32) + dist;
+pub fn calculate_fitness(
+    m: &MarioState,
+    targets: &Targets,
+    goal: impl Interact,
+    frame_count: usize,
+) -> f32 {
+    for x in targets.cylinder.iter() {
+        if x.active {
+            return f32::MAX;
+        }
+    }
+    let dist = goal.horizontal_dist_to_mario(m.pos);
+    let fitness = (frame_count as f32) * 100.0f32 + dist;
+
     fitness
 }
 

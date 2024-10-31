@@ -1,4 +1,5 @@
 #![feature(integer_sign_cast)]
+extern crate core;
 
 mod bruteforce;
 mod includes;
@@ -13,9 +14,8 @@ use crate::utils::file_handling::{DumpFile, InputFile};
 use std::path::Path;
 
 fn main() {
-    let dump_path: &Path = Path::new("C:\\Users\\austi\\Desktop\\rust\\flying-sim-rs\\dump.json");
-    let target_path: &Path =
-        Path::new("C:\\Users\\austi\\Desktop\\rust\\flying-sim-rs\\targets.json");
+    let dump_path: &Path = Path::new("Path\\To\\dump.json");
+    let target_path: &Path = Path::new("Path\\To\\targets.json");
     let mut dump_file = DumpFile::read_file(dump_path).unwrap();
     let mut targets = Targets::read_file(target_path).unwrap();
     let mut input_file: InputFile = dump_file.parse_inputs().unwrap();
@@ -23,6 +23,7 @@ fn main() {
     let m = &input_file.initial_state;
     let goal = input_file.targets.cylinder[input_file.targets.cylinder.len() - 1];
     println!("{:?}", input_file.inputs.len());
+    input_file.inputs.pop();
     mario_bruteforce(m, input_file.targets, goal, input_file.inputs);
     //simulate(&mut input_file);
 }
