@@ -1,25 +1,28 @@
 use crate::bruteforce::fitness::calculate_fitness;
 use crate::includes::mario_state::{MarioState, pack_input, unpack_input_i8};
-use crate::simulations::object_collision::{CylinderHitbox, Targets};
+use crate::simulations::object_collision::{CylinderHitbox, Interact, Targets};
 use rand::Rng;
 
-pub fn perturb_inputs(
+pub fn perturb_inputs<T>(
     mario_state: &mut MarioState,
     targets: &mut Targets,
-    goal: &CylinderHitbox,
-    inputs: &mut Vec<i16>,
+    goal: &T,
+    inputs: &mut [i16],
     fitness: &mut f32,
-) {
+) -> bool
+where
+    for<'a> &'a T: Interact,
+{
     // Randomly perturb
-    let mut new_inputs = inputs.clone();
-    let perturbation_freq = 0.15;
-    let perturbation_perm = 1;
-    let kj = ((new_inputs.len() - 1) as f32 * perturbation_freq) as usize;
-    for i in 0..new_inputs.len() {
-        if i % kj == 0 {
-            let k = rand::thread_rng().gen_range(0..kj);
-            new_inputs[k] = {
-                let mut input = unpack_input_i8(new_inputs[k]);
+    //let mut new_inputs: &mut &[i17] = inputs;
+    let perturbation_freq = 0.15; // 0 to 1
+    let perturbation_perm = 1; // 1 to
+    let freq = (inputs.len() as f32 * (1f32 - perturbation_freq)) as usize;
+    for i in 0..inputs.len() {
+        if i % freq == 0 {
+            let k = rand::thread_rng().gen_range(0..inputs.len());
+            inputs[k] = {
+                let mut input = unpack_input_i8(inputs[k]);
                 input[0] = input[0].wrapping_add(perturbation_perm);
                 input[1] = input[1].wrapping_add(perturbation_perm);
                 pack_input(input[0], input[1])
@@ -27,25 +30,24 @@ pub fn perturb_inputs(
         }
     }
     let mut break_frame: usize = 1;
-    for (i, input) in new_inputs.iter().enumerate() {
+    for (i, input) in inputs.iter().enumerate() {
         mario_state.update_flying(input);
         mario_state.hit_closest_target(targets);
-        if mario_state.hit_goal(goal) {
-            if targets.all_targets_inactive() {
-                break_frame = i;
-                break;
-            }
+        if mario_state.hit_goal(goal) && targets.all_targets_inactive() {
+            break_frame = i + 1;
+            break;
         }
     }
 
     //simulate_inputs(mario_state, targets, &new_inputs);
-    
+
     let new_fitness = calculate_fitness(mario_state, targets, goal, break_frame);
     if new_fitness < *fitness {
         println! {"{:?}, len: {:?}", new_fitness, break_frame};
         *fitness = new_fitness;
-        *inputs = new_inputs;       
+        return true;
     }
+    false
 }
 pub fn mario_bruteforce(
     initial_state: &MarioState,
@@ -53,16 +55,18 @@ pub fn mario_bruteforce(
     goal: CylinderHitbox,
     mut inputs: Vec<i16>,
 ) {
-    let mut f = f32::MAX;
     println!("{:?}", goal);
     let mut mario_first = *initial_state;
     let mut targets_first = targets.clone();
-    f = initial_check(&mut mario_first, &mut targets_first, &goal, &inputs);
-    println!("{:?}", f);
+    let mut fitness = initial_check(&mut mario_first, &mut targets_first, &goal, &inputs);
+    println!("{:?}", fitness);
     loop {
         let mut m = *initial_state;
+        let mut new_inputs = inputs.clone();
         let mut target = targets.clone();
-        perturb_inputs(&mut m, &mut target, &goal, &mut inputs, &mut f);
+        if perturb_inputs(&mut m, &mut target, &goal, &mut new_inputs, &mut fitness) {
+            inputs = new_inputs
+        };
     }
 }
 

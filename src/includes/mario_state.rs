@@ -86,8 +86,8 @@ impl MarioState {
             }
         });
     }
-    pub fn hit_goal(&self, t: impl Interact ) -> bool {
-        if t.is_in_horizontal_bounds(self.pos) && t.is_in_vertical_bounds(self.pos)  {
+    pub fn hit_goal(&self, t: impl Interact) -> bool {
+        if t.is_in_horizontal_bounds(self.pos) && t.is_in_vertical_bounds(self.pos) {
             //println!("{:?}", t.horizontal_dist_to_mario(self.pos));
             return true;
         }

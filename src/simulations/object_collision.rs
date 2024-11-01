@@ -60,7 +60,6 @@ impl Targets {
         }
         true
     }
-    
 }
 
 impl Interact for CylinderHitbox {
@@ -92,7 +91,7 @@ impl Interact for &CylinderHitbox {
     fn is_in_horizontal_bounds(&self, mario_pos: [f32; 3]) -> bool {
         self.horizontal_dist_to_mario(mario_pos) < self.radius
     }
-    fn is_in_vertical_bounds(&self, mario_pos: [f32; 3]) -> bool { 
+    fn is_in_vertical_bounds(&self, mario_pos: [f32; 3]) -> bool {
         /*if self.pos[1] < mario_pos[1] {
            return true;
         };
