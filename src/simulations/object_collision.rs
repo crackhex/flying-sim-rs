@@ -6,8 +6,7 @@ use std::path::Path;
 
 pub trait Interact {
     fn is_active(&self) -> bool;
-    fn is_in_horizontal_bounds(&self, _: [f32; 3]) -> bool;
-    fn is_in_vertical_bounds(&self, _: [f32; 3]) -> bool;
+    fn is_mario_in_bounds(&self, _: [f32; 3]) -> bool;
     fn horizontal_dist_to_mario(&self, _: [f32; 3]) -> f32;
     fn vertical_dist_to_mario(&self, _: [f32; 3]) -> f32;
 }
@@ -66,13 +65,15 @@ impl Interact for CylinderHitbox {
     fn is_active(&self) -> bool {
         self.active
     }
-    fn is_in_horizontal_bounds(&self, mario_pos: [f32; 3]) -> bool {
-        self.horizontal_dist_to_mario(mario_pos) < self.radius
+    fn is_mario_in_bounds(&self, mario_pos: [f32; 3]) -> bool {
+        if mario_pos[1] >= self.pos[1] - 160.0f32
+            && mario_pos[1] <= self.pos[1] + 64.0f32
+            && self.horizontal_dist_to_mario(mario_pos) <= self.radius
+        {
+            return true;
+        }
+        false
     }
-    fn is_in_vertical_bounds(&self, mario_pos: [f32; 3]) -> bool {
-        todo!()
-    }
-
     fn horizontal_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
         let dist: f32 = ((self.pos[0] - mario_pos[0]) * (self.pos[0] - mario_pos[0])
             + (self.pos[2] - mario_pos[2]) * (self.pos[2] - mario_pos[2]))
@@ -88,17 +89,15 @@ impl Interact for &CylinderHitbox {
     fn is_active(&self) -> bool {
         self.active
     }
-    fn is_in_horizontal_bounds(&self, mario_pos: [f32; 3]) -> bool {
-        self.horizontal_dist_to_mario(mario_pos) < self.radius
+    fn is_mario_in_bounds(&self, mario_pos: [f32; 3]) -> bool {
+        if mario_pos[1] >= self.pos[1] - 160.0f32
+            && mario_pos[1] <= self.pos[1] + 64.0f32
+            && self.horizontal_dist_to_mario(mario_pos) <= self.radius
+        {
+            return true;
+        }
+        false
     }
-    fn is_in_vertical_bounds(&self, mario_pos: [f32; 3]) -> bool {
-        /*if self.pos[1] < mario_pos[1] {
-           return true;
-        };
-        false*/
-        true
-    }
-
     fn horizontal_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
         let dist: f32 = ((self.pos[0] - mario_pos[0]) * (self.pos[0] - mario_pos[0])
             + (self.pos[2] - mario_pos[2]) * (self.pos[2] - mario_pos[2]))
@@ -114,10 +113,7 @@ impl Interact for CuboidHitbox {
     fn is_active(&self) -> bool {
         self.active
     }
-    fn is_in_horizontal_bounds(&self, mario_pos: [f32; 3]) -> bool {
-        todo!()
-    }
-    fn is_in_vertical_bounds(&self, mario_pos: [f32; 3]) -> bool {
+    fn is_mario_in_bounds(&self, _: [f32; 3]) -> bool {
         todo!()
     }
     fn horizontal_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {

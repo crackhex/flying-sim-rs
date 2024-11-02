@@ -75,26 +75,45 @@ impl MarioState {
         perform_air_step(self);
         //println!("{:?}", self.pos)
     }
-
     pub fn hit_closest_target(&self, t: &mut Targets) {
-        t.cylinder.iter_mut().for_each(|obj| {
+        let mut min_dist = f32::MAX;
+        let mut index: usize = 0;
+        t.cylinder.iter_mut().enumerate().for_each(|(i, obj)| {
             if obj.is_active() {
                 let dist = obj.horizontal_dist_to_mario(self.pos);
-                if dist < obj.radius {
-                    obj.active = false;
+                if dist < obj.radius
+                    && dist < min_dist
+                    && self.pos[1] >= (obj.pos[1] - 160.0f32)
+                    && self.pos[1] <= (obj.pos[1] + 64.0f32)
+                {
+                    min_dist = dist;
+                    index = i + 1;
                 }
             }
         });
+        if index > 0 {
+            t.cylinder[index - 1].active = false;
+        }
+        t.cuboid.iter_mut().for_each(|hitbox| {
+            if hitbox.is_active() && hitbox.is_mario_in_bounds(self.pos) {
+                hitbox.active = false;
+            }
+        })
     }
     pub fn hit_goal(&self, t: impl Interact) -> bool {
-        if t.is_in_horizontal_bounds(self.pos) && t.is_in_vertical_bounds(self.pos) {
+        if t.is_mario_in_bounds(self.pos) {
             //println!("{:?}", t.horizontal_dist_to_mario(self.pos));
             return true;
         }
         false
     }
+    fn is_mario_in_bounds(&self, mario_pos: [f32; 3]) -> bool {
+        if mario_pos[1] >= self.pos[1] - 160.0f32 && mario_pos[1] <= self.pos[1] + 64.0f32 {
+            return true;
+        }
+        false
+    }
 }
-
 pub fn simulate_inputs(m: &mut MarioState, targets: &mut Targets, inputs: &[i16]) {
     inputs.iter().for_each(|input| {
         m.update_flying(input);
