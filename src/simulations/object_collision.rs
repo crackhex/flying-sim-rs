@@ -21,9 +21,9 @@ pub struct CylinderHitbox {
 }
 #[derive(Default, Serialize, Deserialize, Debug, Copy, Clone)]
 pub struct CuboidHitbox {
-    pub vertices: [[i32; 2]; 4],
+    pub pos: [i32; 3],
+    pub side_length: [i32; 2],
     pub height: i32,
-    pub minimum: i32,
     pub active: bool,
     pub index: u32,
 }
@@ -46,7 +46,7 @@ impl Targets {
         let file = File::create(path)?;
         Ok(serde_json::to_writer(file, &self)?)
     }
-    pub fn all_targets_inactive(&self) -> bool {
+    pub fn all_inactive(&self) -> bool {
         for hitbox in self.cuboid.iter() {
             if hitbox.is_active() {
                 return false;
@@ -113,12 +113,23 @@ impl Interact for CuboidHitbox {
     fn is_active(&self) -> bool {
         self.active
     }
-    fn is_mario_in_bounds(&self, _: [f32; 3]) -> bool {
+    fn is_mario_in_bounds(&self, mario_pos: [f32; 3]) -> bool {
+        if mario_pos[0] > self.pos[0] as f32
+            && mario_pos[0] < (self.pos[0] + self.side_length[0]) as f32
+            && mario_pos[2] > self.pos[2] as f32
+            && mario_pos[2] < (self.pos[2] + self.side_length[1]) as f32
+            && mario_pos[1] > self.pos[1] as f32
+            && mario_pos[1] <= (self.pos[1] + self.height) as f32
+        {
+            return true;
+        };
+        false
+    }
+
+    fn horizontal_dist_to_mario(&self, _: [f32; 3]) -> f32 {
         todo!()
     }
-    fn horizontal_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
-        todo!()
-    }
+
     fn vertical_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
         todo!()
     }

@@ -1,3 +1,4 @@
+use crate::bruteforce::perturbation::{initial_check, perturb_inputs};
 use crate::includes::mario_state::{MarioState, pack_input};
 use crate::simulations::object_collision::Targets;
 use serde::{Deserialize, Serialize};
@@ -7,12 +8,11 @@ use std::io::Write;
 use std::path::Path;
 use thiserror::Error;
 
-#[derive(Default, Serialize, Deserialize, Debug)]
+#[derive(Default, Serialize, Deserialize, Debug, Clone)]
 pub struct InputFile {
     pub initial_state: MarioState,
     pub targets: Targets,
     pub inputs: Vec<i16>,
-    pub states: Vec<MarioState>,
 }
 
 impl InputFile {
@@ -22,7 +22,39 @@ impl InputFile {
 
         Ok(InputFile::deserialize(&mut de)?)
     }
+    pub fn write_file(&self, path: &Path) -> Result<usize, InputFileError> {
+        let mut file = File::create(path)?;
+        let x = serde_json::to_string(&self)?;
+        Ok(file.write(x.as_bytes())?)
+    }
+    pub fn bruteforce(mut self) -> Result<InputFile, InputFileError> {
+        let goal = self.targets.cylinder[self.targets.cylinder.len() - 1];
+        println!("{:?}", goal);
+        let mut mario_first = self.initial_state;
+        let mut targets_first = self.targets.clone();
+        let mut fitness = initial_check(&mut mario_first, &mut targets_first, &goal, &self.inputs);
+        println!("{:?}", fitness);
+
+        loop {
+            let mut m = self.initial_state;
+            let mut new_inputs = self.inputs.clone();
+            let mut target = self.targets.clone();
+            if perturb_inputs(&mut m, &mut target, &goal, &mut new_inputs, &mut fitness) {
+                self.inputs = new_inputs;
+                self.write_file(Path::new("inputs.json"))?;
+            };
+            if fitness < 40413.5f32 {
+                break;
+            }
+        }
+        Ok(self)
+    }
     pub fn initial_mario_state(&self) {}
+}
+pub fn write_file(input_file: &InputFile, path: &Path) -> Result<usize, InputFileError> {
+    let mut file = File::create(path)?;
+    let x = serde_json::to_string(&input_file)?;
+    Ok(file.write(x.as_bytes())?)
 }
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct DumpMemory {
@@ -105,7 +137,6 @@ impl DumpFile {
             state.face_angle[0] = info.memory.mario_pitch;
             let input = pack_input(info.input.X, info.input.Y);
             input_file.inputs.push(input);
-            input_file.states.push(state);
         });
         Ok(input_file)
     }

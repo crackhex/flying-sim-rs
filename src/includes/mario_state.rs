@@ -130,11 +130,9 @@ pub fn simulate(input_file: &mut InputFile) {
         m.hit_closest_target(targets);
         if i < x.len() - 1 {
             println!(
-                "{:?} {:?} {:?} {:?} {:?} {:?} {:?}",
+                " {:?} {:?} {:?} {:?} {:?}",
                 m.pos,
                 m.face_angle[0],
-                input_file.states[i + 1].pos,
-                input_file.states[i + 1].face_angle[0],
                 ((input >> 8i16) & 0xFF) as i8,
                 (input & 0xFF) as i8,
                 m.angle_vel[0]

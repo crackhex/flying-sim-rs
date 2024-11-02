@@ -1,2 +1,2 @@
-mod fitness;
+pub mod fitness;
 pub mod perturbation;
