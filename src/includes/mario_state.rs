@@ -1,6 +1,5 @@
 use crate::simulations::flying_sim::{perform_air_step, update_flying};
-use crate::simulations::object_collision::{Interact, Targets};
-use crate::utils::file_handling::InputFile;
+use crate::simulations::target_interaction::{Interact, Targets};
 use serde::{Deserialize, Serialize};
 
 pub const fn pack_input(x: i8, y: i8) -> i16 {
@@ -100,7 +99,7 @@ impl MarioState {
             }
         })
     }
-    pub fn hit_goal(&self, t: impl Interact) -> bool {
+    pub fn hit_goal(&self, t: &impl Interact) -> bool {
         if t.is_mario_in_bounds(self.pos) {
             //println!("{:?}", t.horizontal_dist_to_mario(self.pos));
             return true;
@@ -113,32 +112,4 @@ impl MarioState {
         }
         false
     }
-}
-pub fn simulate_inputs(m: &mut MarioState, targets: &mut Targets, inputs: &[i16]) {
-    inputs.iter().for_each(|input| {
-        m.update_flying(input);
-        m.hit_closest_target(targets);
-    });
-}
-pub fn simulate(input_file: &mut InputFile) {
-    let m = &mut input_file.initial_state;
-    let x = &*input_file.inputs;
-    let mut targets = &mut input_file.targets;
-    println!("{:?}", targets);
-    for (i, input) in x.iter().enumerate() {
-        m.update_flying(input);
-        m.hit_closest_target(targets);
-        if i < x.len() - 1 {
-            println!(
-                " {:?} {:?} {:?} {:?} {:?}",
-                m.pos,
-                m.face_angle[0],
-                ((input >> 8i16) & 0xFF) as i8,
-                (input & 0xFF) as i8,
-                m.angle_vel[0]
-            );
-        }
-    }
-    println! {"{:?}", targets}
-    //simulate_inputs(mario, x.into());
 }

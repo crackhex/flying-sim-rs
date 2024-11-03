@@ -1,5 +1,5 @@
 use crate::includes::mario_state::MarioState;
-use crate::simulations::object_collision::{CylinderHitbox, Interact, Targets};
+use crate::simulations::target_interaction::{CylinderHitbox, Interact, Targets};
 
 pub struct Segment {
     // Dymamic dispatch for targets? Probably not a good idea for performance.
@@ -14,7 +14,7 @@ pub struct Segment {
 pub fn calculate_fitness(
     m: &MarioState,
     targets: &Targets,
-    goal: impl Interact,
+    goal: &impl Interact,
     frame_count: usize,
 ) -> f32 {
     for x in targets.cylinder.iter() {
@@ -37,6 +37,18 @@ pub fn final_target(targets: &Targets) -> Option<&CylinderHitbox> {
         .find(|&i| i.index.cmp(&final_index).is_eq())
 }
 
+pub fn initial_fitness(
+    m: &mut MarioState,
+    targets: &mut Targets,
+    goal: &impl Interact,
+    inputs: &[i16],
+) -> f32 {
+    inputs.iter().for_each(|input| {
+        m.update_flying(input);
+        m.hit_closest_target(targets);
+    });
+    calculate_fitness(m, targets, goal, inputs.len())
+}
 pub fn generate_targets(
     initial_state: &mut MarioState,
     inputs: &[i16],

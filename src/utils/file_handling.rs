@@ -1,6 +1,5 @@
-use crate::bruteforce::perturbation::{initial_check, perturb_inputs};
 use crate::includes::mario_state::{MarioState, pack_input};
-use crate::simulations::object_collision::Targets;
+use crate::simulations::target_interaction::Targets;
 use serde::{Deserialize, Serialize};
 use serde_json::Deserializer;
 use std::fs::File;
@@ -14,7 +13,6 @@ pub struct InputFile {
     pub targets: Targets,
     pub inputs: Vec<i16>,
 }
-
 impl InputFile {
     pub fn read_file(&self, path: &Path) -> Result<InputFile, InputFileError> {
         let file = File::open(path)?;
@@ -27,35 +25,8 @@ impl InputFile {
         let x = serde_json::to_string(&self)?;
         Ok(file.write(x.as_bytes())?)
     }
-    pub fn bruteforce(mut self) -> Result<InputFile, InputFileError> {
-        let goal = self.targets.cylinder[self.targets.cylinder.len() - 1];
-        println!("{:?}", goal);
-        let mut mario_first = self.initial_state;
-        let mut targets_first = self.targets.clone();
-        let mut fitness = initial_check(&mut mario_first, &mut targets_first, &goal, &self.inputs);
-        println!("{:?}", fitness);
+}
 
-        loop {
-            let mut m = self.initial_state;
-            let mut new_inputs = self.inputs.clone();
-            let mut target = self.targets.clone();
-            if perturb_inputs(&mut m, &mut target, &goal, &mut new_inputs, &mut fitness) {
-                self.inputs = new_inputs;
-                self.write_file(Path::new("inputs.json"))?;
-            };
-            if fitness < 40413.5f32 {
-                break;
-            }
-        }
-        Ok(self)
-    }
-    pub fn initial_mario_state(&self) {}
-}
-pub fn write_file(input_file: &InputFile, path: &Path) -> Result<usize, InputFileError> {
-    let mut file = File::create(path)?;
-    let x = serde_json::to_string(&input_file)?;
-    Ok(file.write(x.as_bytes())?)
-}
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct DumpMemory {
     mario_x: f32,
@@ -102,7 +73,6 @@ impl DumpFile {
     pub fn read_file(path_buf: &Path) -> Result<DumpFile, InputFileError> {
         let file = File::open(path_buf)?;
         let mut de = Deserializer::from_reader(&file);
-
         Ok(DumpFile::deserialize(&mut de)?)
     }
     pub fn write_file(&self, path: &Path) -> Result<usize, InputFileError> {
@@ -125,7 +95,6 @@ impl DumpFile {
             initial_state,
             ..Default::default()
         };
-
         data.iter().for_each(|info| {
             let mut state = MarioState::default();
             state.pos = [
