@@ -11,7 +11,7 @@ pub trait Interact {
     fn vertical_dist_to_mario(&self, _: [f32; 3]) -> f32;
 }
 
-#[derive(Default, Serialize, Deserialize, Debug, Copy, Clone)]
+#[derive(Default, Serialize, Deserialize, Debug, Clone)]
 pub struct CylinderHitbox {
     pub pos: [f32; 3],
     pub radius: f32,
@@ -19,6 +19,30 @@ pub struct CylinderHitbox {
     pub height: u32,
     pub index: u32,
 }
+impl Interact for CylinderHitbox {
+    fn is_active(&self) -> bool {
+        self.active
+    }
+    fn is_mario_in_bounds(&self, mario_pos: [f32; 3]) -> bool {
+        if mario_pos[1] >= self.pos[1] - 160.0f32
+            && mario_pos[1] <= self.pos[1] + 64.0f32
+            && self.horizontal_dist_to_mario(mario_pos) <= self.radius
+        {
+            return true;
+        }
+        false
+    }
+    fn horizontal_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
+        let dist: f32 = ((self.pos[0] - mario_pos[0]) * (self.pos[0] - mario_pos[0])
+            + (self.pos[2] - mario_pos[2]) * (self.pos[2] - mario_pos[2]))
+            .sqrt();
+        dist
+    }
+    fn vertical_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
+        todo!()
+    }
+}
+
 #[derive(Default, Serialize, Deserialize, Debug, Copy, Clone)]
 pub struct CuboidHitbox {
     pub pos: [i32; 3],
@@ -27,10 +51,32 @@ pub struct CuboidHitbox {
     pub active: bool,
     pub index: u32,
 }
-pub enum Hitboxes {
-    Cylinder(CylinderHitbox),
-    Cuboid(CuboidHitbox),
+impl Interact for CuboidHitbox {
+    fn is_active(&self) -> bool {
+        self.active
+    }
+    fn is_mario_in_bounds(&self, mario_pos: [f32; 3]) -> bool {
+        if mario_pos[0] > self.pos[0] as f32
+            && mario_pos[0] < (self.pos[0] + self.side_length[0]) as f32
+            && mario_pos[2] > self.pos[2] as f32
+            && mario_pos[2] < (self.pos[2] + self.side_length[1]) as f32
+            && mario_pos[1] > self.pos[1] as f32
+            && mario_pos[1] <= (self.pos[1] + self.height) as f32
+        {
+            return true;
+        };
+        false
+    }
+
+    fn horizontal_dist_to_mario(&self, _: [f32; 3]) -> f32 {
+        todo!()
+    }
+
+    fn vertical_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
+        todo!()
+    }
 }
+
 #[derive(Default, Serialize, Deserialize, Debug, Clone)]
 pub struct Targets {
     pub cuboid: Vec<CuboidHitbox>,
@@ -58,79 +104,5 @@ impl Targets {
             }
         }
         true
-    }
-}
-
-impl Interact for CylinderHitbox {
-    fn is_active(&self) -> bool {
-        self.active
-    }
-    fn is_mario_in_bounds(&self, mario_pos: [f32; 3]) -> bool {
-        if mario_pos[1] >= self.pos[1] - 160.0f32
-            && mario_pos[1] <= self.pos[1] + 64.0f32
-            && self.horizontal_dist_to_mario(mario_pos) <= self.radius
-        {
-            return true;
-        }
-        false
-    }
-    fn horizontal_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
-        let dist: f32 = ((self.pos[0] - mario_pos[0]) * (self.pos[0] - mario_pos[0])
-            + (self.pos[2] - mario_pos[2]) * (self.pos[2] - mario_pos[2]))
-            .sqrt();
-        dist
-    }
-    fn vertical_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
-        todo!()
-    }
-}
-
-impl Interact for &CylinderHitbox {
-    fn is_active(&self) -> bool {
-        self.active
-    }
-    fn is_mario_in_bounds(&self, mario_pos: [f32; 3]) -> bool {
-        if mario_pos[1] >= self.pos[1] - 160.0f32
-            && mario_pos[1] <= self.pos[1] + 64.0f32
-            && self.horizontal_dist_to_mario(mario_pos) <= self.radius
-        {
-            return true;
-        }
-        false
-    }
-    fn horizontal_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
-        let dist: f32 = ((self.pos[0] - mario_pos[0]) * (self.pos[0] - mario_pos[0])
-            + (self.pos[2] - mario_pos[2]) * (self.pos[2] - mario_pos[2]))
-            .sqrt();
-        dist
-    }
-    fn vertical_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
-        (self.pos[1] - mario_pos[1]).abs()
-    }
-}
-
-impl Interact for CuboidHitbox {
-    fn is_active(&self) -> bool {
-        self.active
-    }
-    fn is_mario_in_bounds(&self, mario_pos: [f32; 3]) -> bool {
-        if mario_pos[0] > self.pos[0] as f32
-            && mario_pos[0] < (self.pos[0] + self.side_length[0]) as f32
-            && mario_pos[2] > self.pos[2] as f32
-            && mario_pos[2] < (self.pos[2] + self.side_length[1]) as f32
-            && mario_pos[1] > self.pos[1] as f32
-            && mario_pos[1] <= (self.pos[1] + self.height) as f32
-        {
-            return true;
-        };
-        false
-    }
-
-    fn horizontal_dist_to_mario(&self, _: [f32; 3]) -> f32 {
-        todo!()
-    }
-
-    fn vertical_dist_to_mario(&self, mario_pos: [f32; 3]) -> f32 {
-        todo!()
     }
 }
