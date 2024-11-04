@@ -1,11 +1,12 @@
 use crate::includes::mario_state::MarioState;
 use crate::simulations::target_interaction::{CylinderHitbox, Interact, Targets};
 
+#[derive(Default, Debug, Clone)]
 pub struct Segment {
     // Dymamic dispatch for targets? Probably not a good idea for performance.
     pub inputs: Vec<i16>,
     pub initial_state: MarioState,
-    pub target: CylinderHitbox,
+    pub targets: Targets,
     pub fitness: f32,
 }
 // Extremely basic fitness function
@@ -38,16 +39,16 @@ pub fn final_target(targets: &Targets) -> Option<&CylinderHitbox> {
 }
 
 pub fn initial_fitness(
-    m: &mut MarioState,
+    mario_state: &mut MarioState,
     targets: &mut Targets,
     goal: &impl Interact,
     inputs: &[i16],
 ) -> f32 {
     inputs.iter().for_each(|input| {
-        m.update_flying(input);
-        m.hit_closest_target(targets);
+        mario_state.update_flying(input);
+        mario_state.hit_closest_target(targets);
     });
-    calculate_fitness(m, targets, goal, inputs.len())
+    calculate_fitness(mario_state, targets, goal, inputs.len())
 }
 pub fn generate_targets(
     initial_state: &mut MarioState,
@@ -67,4 +68,30 @@ pub fn generate_targets(
     }
 }
 
-pub fn generate_segments(initial_state: &mut MarioState, inputs: &[i16], target: CylinderHitbox) {}
+pub fn generate_segments(
+    mario_state: &mut MarioState,
+    inputs: &[i16],
+    targets: &Targets,
+) -> Vec<Segment> {
+    let mut segment_list: Vec<Segment> = vec![];
+    let segment_size: usize = 40;
+    let num_segments: usize = inputs.len().div_ceil(segment_size);
+    let mut current_segment: usize = 1;
+    (0..num_segments).for_each(|_| {
+        let segment = Segment {
+            targets: targets.clone(),
+            ..Default::default()
+        };
+        segment_list.push(segment);
+    });
+    // Will make short extra segments not happen, maybe append to the previous segment
+    for (i, input) in inputs.iter().enumerate() {
+        if i % segment_size == 0 && i != 0 {
+            current_segment += 1
+        }
+        mario_state.update_flying(input);
+        mario_state.hit_closest_target(&mut segment_list[current_segment].targets);
+        segment_list[current_segment].inputs.push(*input);
+    }
+    segment_list
+}
