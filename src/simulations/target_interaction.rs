@@ -11,7 +11,7 @@ pub trait Interact {
     fn vertical_dist_to_mario(&self, _: [f32; 3]) -> f32;
 }
 
-#[derive(Default, Serialize, Deserialize, Debug, Clone)]
+#[derive(Default, Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct CylinderHitbox {
     pub pos: [f32; 3],
     pub radius: f32,
@@ -104,5 +104,19 @@ impl Targets {
             }
         }
         true
+    }
+    pub fn list_inactive(&self) -> Targets {
+        let mut inactive_targets: Targets = Targets::default();
+        self.cuboid.iter().for_each(|cuboid| {
+            if !cuboid.active {
+                inactive_targets.cuboid.push(*cuboid);
+            }
+        });
+        self.cylinder.iter().for_each(|cylinder| {
+            if !cylinder.active {
+                inactive_targets.cylinder.push(*cylinder);
+            }
+        });
+        inactive_targets
     }
 }

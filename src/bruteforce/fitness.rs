@@ -70,13 +70,13 @@ pub fn generate_targets(
 
 pub fn generate_segments(
     mario_state: &mut MarioState,
-    inputs: &[i16],
     targets: &Targets,
+    inputs: &[i16],
 ) -> Vec<Segment> {
     let mut segment_list: Vec<Segment> = vec![];
     let segment_size: usize = 40;
     let num_segments: usize = inputs.len().div_ceil(segment_size);
-    let mut current_segment: usize = 1;
+    let mut current_segment: usize = 0;
     (0..num_segments).for_each(|_| {
         let segment = Segment {
             targets: targets.clone(),
@@ -84,14 +84,20 @@ pub fn generate_segments(
         };
         segment_list.push(segment);
     });
+
     // Will make short extra segments not happen, maybe append to the previous segment
     for (i, input) in inputs.iter().enumerate() {
         if i % segment_size == 0 && i != 0 {
+            let segment_targets = segment_list[current_segment].targets.list_inactive();
+            segment_list[current_segment].initial_state = *mario_state;
+            segment_list[current_segment].targets = segment_targets;
             current_segment += 1
         }
         mario_state.update_flying(input);
         mario_state.hit_closest_target(&mut segment_list[current_segment].targets);
         segment_list[current_segment].inputs.push(*input);
     }
+    let segment_targets = segment_list[current_segment].targets.list_inactive();
+    segment_list[current_segment].targets = segment_targets;
     segment_list
 }

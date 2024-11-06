@@ -1,10 +1,12 @@
-use crate::bruteforce::fitness::{calculate_fitness, initial_fitness};
+use crate::bruteforce::fitness::{calculate_fitness, generate_segments, initial_fitness};
 use crate::bruteforce::perturbation::perturb_inputs;
+use crate::includes::mario_state::MarioState;
 use crate::utils::file_handling::{InputFile, InputFileError};
 
 pub fn mario_bruteforce(mut input_file: InputFile) -> Result<InputFile, InputFileError> {
+    let mut initial_state: MarioState = input_file.initial_state;
+    let segments = generate_segments(&mut initial_state, &input_file.targets, &input_file.inputs);
     let goal = &input_file.targets.cylinder[input_file.targets.cylinder.len() - 1];
-    println!("{:?}", goal);
     let mut mario_first = input_file.initial_state;
     let mut targets_first = input_file.targets.clone();
     let mut fitness = initial_fitness(
