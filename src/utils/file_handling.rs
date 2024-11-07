@@ -39,12 +39,16 @@ pub struct DumpMemory {
     mario_z_sliding_speed: f32,
     mario_facing_yaw: u16,
     mario_pitch: i16,
+    mario_yaw_vel: i16,
+    mario_pitch_vel: i16,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DumpInputs {
-    X: i8,
-    Y: i8,
+    #[serde(rename = "X")]
+    x: i8,
+    #[serde(rename = "Y")]
+    y: i8,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -91,6 +95,9 @@ impl DumpFile {
         ];
         initial_state.face_angle[1] = first.memory.mario_facing_yaw.cast_signed();
         initial_state.face_angle[0] = first.memory.mario_pitch;
+        initial_state.forward_vel = first.memory.mario_f_speed;
+        initial_state.vel[1] = first.memory.mario_v_speed;
+        initial_state.angle_vel = [first.memory.mario_pitch_vel, first.memory.mario_yaw_vel, 0];
         let mut input_file = InputFile {
             initial_state,
             ..Default::default()
@@ -104,7 +111,7 @@ impl DumpFile {
             ];
             state.face_angle[1] = info.memory.mario_facing_yaw.cast_signed();
             state.face_angle[0] = info.memory.mario_pitch;
-            let input = pack_input(info.input.X, info.input.Y);
+            let input = pack_input(info.input.x, info.input.y);
             input_file.inputs.push(input);
         });
         Ok(input_file)

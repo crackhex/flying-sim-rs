@@ -44,10 +44,12 @@ pub fn initial_fitness(
     goal: &impl Interact,
     inputs: &[i16],
 ) -> f32 {
+    println!("{:?}", mario_state);
     inputs.iter().for_each(|input| {
         mario_state.update_flying(input);
         mario_state.hit_closest_target(targets);
     });
+    println!("{:?}", mario_state);
     calculate_fitness(mario_state, targets, goal, inputs.len())
 }
 pub fn generate_targets(

@@ -36,6 +36,7 @@ pub fn mario_bruteforce(mut input_file: InputFile) -> Result<InputFile, InputFil
             println! {"{:?}, len: {:?}", new_fitness, break_frame};
             fitness = new_fitness;
             input_file.inputs = new_inputs;
+            //let _ = input_file.write_file("inputs.json".as_ref());
         }
     }
 }

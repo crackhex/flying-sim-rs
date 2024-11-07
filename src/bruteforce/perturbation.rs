@@ -3,14 +3,13 @@ use rand::Rng;
 
 pub fn perturb_inputs(inputs: &mut [i16]) {
     // Randomly perturb
-    let perturbation_freq = 0.2; // 0 to 1
-    let perturbation_perm = 25; // 1 to
-    let freq = ((inputs.len() as f32 * (1f32 - perturbation_freq)) / 5.0f32) as usize;
-    for i in 0..inputs.len() {
-        let k = rand::thread_rng().gen_range(0..inputs.len());
-        if (i + k) % freq == 1 {
-            inputs[k] = {
-                let mut input = unpack_input_i8(inputs[k]);
+    let perturbation_freq = 0.1; // 0 to 1
+    let perturbation_perm = 10; // 1 to
+    for i in inputs.iter_mut() {
+        let rand_float = rand::thread_rng().gen_range(0..100) as f32;
+        if rand_float < perturbation_freq * 100.0f32 {
+            *i = {
+                let mut input = unpack_input_i8(*i);
                 input[0] = input[0].wrapping_add(
                     rand::thread_rng().gen_range(-perturbation_perm..perturbation_perm),
                 );
@@ -18,7 +17,7 @@ pub fn perturb_inputs(inputs: &mut [i16]) {
                     rand::thread_rng().gen_range(-perturbation_perm..perturbation_perm),
                 );
                 pack_input(input[0], input[1])
-            };
+            }
         }
     }
 }
