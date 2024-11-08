@@ -53,9 +53,9 @@ pub struct DumpInputs {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DumpStruct {
-    varwatch: Vec<String>,
-    memory: DumpMemory,
+    sample: u32,
     input: DumpInputs,
+    memory: DumpMemory,
     frame: u32,
 }
 

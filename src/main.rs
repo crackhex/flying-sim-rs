@@ -1,4 +1,6 @@
 #![feature(integer_sign_cast)]
+#![feature(int_roundings)]
+#![feature(ascii_char)]
 extern crate core;
 
 mod bruteforce;
