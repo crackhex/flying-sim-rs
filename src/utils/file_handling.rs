@@ -25,6 +25,11 @@ impl InputFile {
         let x = serde_json::to_string(&self)?;
         Ok(file.write(x.as_bytes())?)
     }
+    pub fn write_to_m64(&self, path: &Path) -> Result<(), InputFileError> {
+        let mut file = File::create(path)?;
+        // TODO: Write to m64 file
+        Ok(())
+    }
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]

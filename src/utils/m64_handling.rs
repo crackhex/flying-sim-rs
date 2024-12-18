@@ -260,4 +260,15 @@ impl M64File {
         }
         Ok(self)
     }
+    pub fn replace_inputs(&mut self, overwrite_range: &Range<usize>, input_range: &Range<usize>, replacement_inputs: &Inputs) -> Result<&mut M64File, M64Error> {
+        let active_controllers = active_controllers(self.header.controller_flags)?;
+        for i in 0..active_controllers.len() {
+            let inputs = &mut self.inputs[active_controllers[i]];
+            let end = inputs.split_off(overwrite_range.start);
+            inputs.extend_from_slice(&replacement_inputs[active_controllers[i]][input_range.start..input_range.end]);
+            inputs.extend_from_slice(&end);
+        }
+        // TODO: Check and implement this function
+        Ok(self)
+    }
 }

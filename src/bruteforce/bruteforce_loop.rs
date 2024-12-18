@@ -30,13 +30,12 @@ pub fn mario_bruteforce(mut input_file: InputFile) -> Result<InputFile, InputFil
                 break;
             }
         }
-
         let new_fitness = calculate_fitness(&mario_state, &targets, goal, break_frame);
         if new_fitness < fitness && break_frame > 1 {
             println! {"{:?}, len: {:?}", new_fitness, break_frame};
             fitness = new_fitness;
             input_file.inputs = new_inputs;
-            //let _ = input_file.write_file("inputs.json".as_ref());
+            let _ = input_file.write_file("inputs.json".as_ref());
         }
     }
 }
