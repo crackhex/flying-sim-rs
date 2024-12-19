@@ -77,6 +77,43 @@ pub fn active_controllers(controller_flags: u32) -> Result<Vec<usize>, M64Error>
         .then_some(active_controllers)
         .ok_or(M64Error::ParsingError)
 }
+
+impl From<i16> for Input {
+    fn from(input: i16) -> Input {
+        Input {
+            x: input.shr(8) as i8,
+            y: input as i8,
+            ..Default::default()
+        }
+    }
+}
+impl From<u32> for Input {
+    fn from(input: u32) -> Input {
+        Input {
+            r_dpad: (input & 0x01) != 0,
+            l_dpad: (input & 0x02) != 0,
+            d_dpad: (input & 0x04) != 0,
+            u_dpad: (input & 0x08) != 0,
+            start: (input & 0x10) != 0,
+            z_trig: (input & 0x20) != 0,
+            b_button: (input & 0x40) != 0,
+            a_button: (input & 0x80) != 0,
+            c_right: (input & 0x100) != 0,
+            c_left: (input & 0x200) != 0,
+            c_down: (input & 0x400) != 0,
+            c_up: (input & 0x800) != 0,
+            r_trig: (input & 0x1000) != 0,
+            l_trig: (input & 0x2000) != 0,
+            x: input.shr(16) as i8,
+            y: input.shr(24) as i8,
+        }
+    }
+}
+impl From<[u8; 4]> for Input {
+    fn from(input: [u8; 4]) -> Input {
+        u32::from_le_bytes(input).into()
+    }
+}
 impl Input {
     fn parse(input_bytes: &[u8], controller_flags: u8) -> Result<Inputs, M64Error> {
         let mut inputs: Inputs = Inputs::default();
@@ -84,24 +121,7 @@ impl Input {
         for i in (0..input_bytes.len()).step_by(4) {
             let input = u32::from_le_bytes(input_bytes[i..i + 4].try_into().unwrap());
             let current_controller = active_controllers[(i / 4) % active_controllers.len()];
-            inputs[current_controller].push(Self {
-                r_dpad: (input & 0x01) != 0,
-                l_dpad: (input & 0x02) != 0,
-                d_dpad: (input & 0x04) != 0,
-                u_dpad: (input & 0x08) != 0,
-                start: (input & 0x10) != 0,
-                z_trig: (input & 0x20) != 0,
-                b_button: (input & 0x40) != 0,
-                a_button: (input & 0x80) != 0,
-                c_right: (input & 0x100) != 0,
-                c_left: (input & 0x200) != 0,
-                c_down: (input & 0x400) != 0,
-                c_up: (input & 0x800) != 0,
-                r_trig: (input & 0x1000) != 0,
-                l_trig: (input & 0x2000) != 0,
-                x: input.shr(16) as i8,
-                y: input.shr(24) as i8,
-            });
+            inputs[current_controller].push(input.into());
         }
         Ok(inputs)
     }
