@@ -200,6 +200,14 @@ impl M64Header {
         Ok(m64)
     }
 }
+
+pub fn construct_inputs_i16(inputs: &[i16]) -> Inputs {
+    let arr = core::array::from_fn(|i| {
+        let inputs: Vec<Input> = inputs.iter().map(|x| (*x).into()).collect();
+        inputs
+    });
+    arr
+}
 impl M64File {
     pub fn new() -> Self {
         Self {
@@ -296,13 +304,20 @@ impl M64File {
         }
         Ok(self)
     }
-    pub fn replace_inputs(&mut self, overwrite_range: &Range<usize>, input_range: &Range<usize>, replacement_inputs: &Inputs) -> Result<&mut M64File, M64Error> {
+    pub fn replace_inputs(
+        &mut self,
+        overwrite_range: &Range<usize>,
+        input_range: &Range<usize>,
+        replacement_inputs: &Inputs,
+    ) -> Result<&mut M64File, M64Error> {
         let active_controllers = active_controllers(self.header.controller_flags)?;
         for i in 0..active_controllers.len() {
             self.inputs[active_controllers[i]].drain(&overwrite_range.start..&overwrite_range.end);
             let inputs = &mut self.inputs[active_controllers[i]];
             let end = inputs.split_off(overwrite_range.start);
-            inputs.extend_from_slice(&replacement_inputs[active_controllers[i]][input_range.start..input_range.end]);
+            inputs.extend_from_slice(
+                &replacement_inputs[active_controllers[i]][input_range.start..input_range.end],
+            );
             inputs.extend_from_slice(&end);
         }
         // TODO: Check and implement this function

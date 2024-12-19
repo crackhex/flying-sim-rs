@@ -10,12 +10,10 @@ pub fn perturb_inputs(inputs: &mut [i16]) {
         if rand_float < perturbation_freq * 100.0f32 {
             *i = {
                 let mut input = unpack_input_i8(*i);
-                input[0] = input[0].wrapping_add(
-                    rand::rng().random_range(-perturbation_perm..perturbation_perm),
-                );
-                input[1] = input[1].wrapping_add(
-                    rand::rng().random_range(-perturbation_perm..perturbation_perm),
-                );
+                input[0] = input[0]
+                    .wrapping_add(rand::rng().random_range(-perturbation_perm..perturbation_perm));
+                input[1] = input[1]
+                    .wrapping_add(rand::rng().random_range(-perturbation_perm..perturbation_perm));
                 pack_input(input[0], input[1])
             }
         }

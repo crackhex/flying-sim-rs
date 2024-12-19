@@ -1,11 +1,11 @@
 #[cfg(test)]
 mod tests {
+    use crate::includes::trig_table::coss;
+    use crate::utils::m64_handling::M64File;
     use std::fs::File;
     use std::io::Read;
     use std::path::Path;
-    use crate::includes::trig_table::coss;
     use std::time::Instant;
-    use crate::utils::m64_handling::M64File;
 
     #[test]
     fn test_trig() {
@@ -25,7 +25,10 @@ mod tests {
         let _x = m64.write_file(test_w).unwrap();
         let mut buf1: Vec<u8> = Vec::new();
         let mut buf2: Vec<u8> = Vec::new();
-        File::open(test_m64).unwrap().read_to_end(&mut buf1).unwrap();
+        File::open(test_m64)
+            .unwrap()
+            .read_to_end(&mut buf1)
+            .unwrap();
         File::open(test_w).unwrap().read_to_end(&mut buf2).unwrap();
         assert_eq!(buf1, buf2);
         println!("\n aa{:?}", m64.inputs[0]);
