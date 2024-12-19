@@ -1,2 +1,2 @@
 pub(crate) mod file_handling;
-mod m64_handling;
+pub(crate) mod m64_handling;

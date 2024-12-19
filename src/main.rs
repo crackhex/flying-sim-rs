@@ -6,8 +6,8 @@ extern crate core;
 mod bruteforce;
 mod includes;
 mod simulations;
-mod tests;
 mod utils;
+mod tests;
 
 use crate::bruteforce::bruteforce_loop::mario_bruteforce;
 use crate::simulations::target_interaction::Targets;

@@ -1,7 +1,10 @@
 use bitvec::prelude::BitArray;
 use bitvec::view::BitViewSized;
 use std::ascii::Char as AsciiChar;
+use std::fs::File;
+use std::io::{Read, Write};
 use std::ops::{Range, Shr};
+use std::path::Path;
 use thiserror::Error;
 
 pub type Inputs = [Vec<Input>; 4];
@@ -44,7 +47,7 @@ pub enum M64Error {
     HeaderIncomplete,
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 pub struct Input {
     pub r_dpad: bool,
     pub l_dpad: bool,
@@ -75,7 +78,7 @@ pub fn active_controllers(controller_flags: u32) -> Result<Vec<usize>, M64Error>
         .ok_or(M64Error::ParsingError)
 }
 impl Input {
-    fn parse(input_bytes: &ByteVec, controller_flags: u8) -> Result<Inputs, M64Error> {
+    fn parse(input_bytes: &[u8], controller_flags: u8) -> Result<Inputs, M64Error> {
         let mut inputs: Inputs = Inputs::default();
         let active_controllers = active_controllers(controller_flags as u32)?;
         for i in (0..input_bytes.len()).step_by(4) {
@@ -184,6 +187,19 @@ impl M64File {
             inputs: Inputs::default(),
         }
     }
+    pub fn write_file(&self, path: &Path) -> Result<(), M64Error> {
+        let mut file = File::create(path)?;
+        Ok(file.write_all(&self.to_bytes()?)?)
+    }
+    pub fn read_file(path: &Path) -> Result<M64File, M64Error> {
+        let mut file = File::open(path)?;
+        let mut buffer = Vec::new();
+        file.read_to_end(&mut buffer)?;
+        let header = M64Header::from_bytes(&buffer)?;
+        let inputs = Input::parse(&buffer[0x400..], header.controller_count)?;
+        Ok(M64File { header, inputs })
+    }
+
     pub fn samples_to_bytes(&self, active_controllers: &[usize]) -> Result<ByteVec, M64Error> {
         let size = self.inputs[0].len()
             + self.inputs[1].len()
@@ -263,6 +279,7 @@ impl M64File {
     pub fn replace_inputs(&mut self, overwrite_range: &Range<usize>, input_range: &Range<usize>, replacement_inputs: &Inputs) -> Result<&mut M64File, M64Error> {
         let active_controllers = active_controllers(self.header.controller_flags)?;
         for i in 0..active_controllers.len() {
+            self.inputs[active_controllers[i]].drain(&overwrite_range.start..&overwrite_range.end);
             let inputs = &mut self.inputs[active_controllers[i]];
             let end = inputs.split_off(overwrite_range.start);
             inputs.extend_from_slice(&replacement_inputs[active_controllers[i]][input_range.start..input_range.end]);
