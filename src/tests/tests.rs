@@ -19,10 +19,10 @@ mod tests {
 
     #[test]
     fn test_m64() {
-        let test_m64 = Path::new("src\\tests\\test_r.m64");
+        let test_m64 = Path::new("src/tests/test_r.m64");
         let m64 = M64File::read_file(test_m64).unwrap();
-        let test_w = Path::new("src\\tests\\test_w.m64");
-        let _x = m64.write_file(test_w).unwrap();
+        let test_w = Path::new("src/tests/test_w.m64");
+        m64.write_file(test_w).unwrap();
         let mut buf1: Vec<u8> = Vec::new();
         let mut buf2: Vec<u8> = Vec::new();
         File::open(test_m64)
