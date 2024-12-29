@@ -312,13 +312,11 @@ impl M64File {
     ) -> Result<&mut M64File, M64Error> {
         let active_controllers = active_controllers(self.header.controller_flags)?;
         for i in 0..active_controllers.len() {
-            self.inputs[active_controllers[i]].drain(&overwrite_range.start..&overwrite_range.end);
-            let inputs = &mut self.inputs[active_controllers[i]];
-            let end = inputs.split_off(overwrite_range.start);
-            inputs.extend_from_slice(
-                &replacement_inputs[active_controllers[i]][input_range.start..input_range.end],
-            );
-            inputs.extend_from_slice(&end);
+            let end_inputs: Vec<Input> = self.inputs[active_controllers[i]].drain(&overwrite_range.end..).collect();
+            self.inputs[active_controllers[i]].truncate(overwrite_range.start);
+            let mut inputs = replacement_inputs[active_controllers[i]].clone();
+            inputs.extend_from_slice(&end_inputs);
+            self.inputs[active_controllers[i]].extend_from_slice(&inputs);
         }
         // TODO: Check and implement this function
         Ok(self)
