@@ -314,11 +314,9 @@ impl M64File {
         for i in 0..active_controllers.len() {
             let end_inputs: Vec<Input> = self.inputs[active_controllers[i]].drain(&overwrite_range.end..).collect();
             self.inputs[active_controllers[i]].truncate(overwrite_range.start);
-            let mut inputs = replacement_inputs[active_controllers[i]].clone();
-            inputs.extend_from_slice(&end_inputs);
-            self.inputs[active_controllers[i]].extend_from_slice(&inputs);
+            self.inputs[active_controllers[i]].extend_from_slice(&replacement_inputs[active_controllers[i]]);
+            self.inputs[active_controllers[i]].extend_from_slice(&end_inputs);
         }
-        // TODO: Check and implement this function
         Ok(self)
     }
 }
