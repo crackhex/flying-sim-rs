@@ -93,17 +93,14 @@ pub const fn perform_air_step(m: &mut MarioState) {
     intended_pos[0] = m.pos[0] + (m.vel[0] / 4.0);
     intended_pos[1] = m.pos[1] + (m.vel[1] / 4.0);
     intended_pos[2] = m.pos[2] + (m.vel[2] / 4.0);
-    m.pos = intended_pos;
-    intended_pos[0] = m.pos[0] + (m.vel[0] / 4.0);
-    intended_pos[1] = m.pos[1] + (m.vel[1] / 4.0);
-    intended_pos[2] = m.pos[2] + (m.vel[2] / 4.0);
-    m.pos = intended_pos;
-    intended_pos[0] = m.pos[0] + (m.vel[0] / 4.0);
-    intended_pos[1] = m.pos[1] + (m.vel[1] / 4.0);
-    intended_pos[2] = m.pos[2] + (m.vel[2] / 4.0);
-    m.pos = intended_pos;
-    intended_pos[0] = m.pos[0] + (m.vel[0] / 4.0);
-    intended_pos[1] = m.pos[1] + (m.vel[1] / 4.0);
-    intended_pos[2] = m.pos[2] + (m.vel[2] / 4.0);
+    intended_pos[0] = intended_pos[0] + (m.vel[0] / 4.0);
+    intended_pos[1] = intended_pos[1] + (m.vel[1] / 4.0);
+    intended_pos[2] = intended_pos[2] + (m.vel[2] / 4.0);
+    intended_pos[0] = intended_pos[0] + (m.vel[0] / 4.0);
+    intended_pos[0] = intended_pos[0] + (m.vel[0] / 4.0);
+    intended_pos[1] = intended_pos[1] + (m.vel[1] / 4.0);
+    intended_pos[2] = intended_pos[2] + (m.vel[2] / 4.0);
+    intended_pos[1] = intended_pos[1] + (m.vel[1] / 4.0);
+    intended_pos[2] = intended_pos[2] + (m.vel[2] / 4.0);
     m.pos = intended_pos;
 }
