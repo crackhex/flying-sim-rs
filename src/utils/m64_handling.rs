@@ -202,7 +202,7 @@ impl M64Header {
 }
 
 pub fn construct_inputs_i16(inputs: &[i16]) -> Inputs {
-    let arr = core::array::from_fn(|i| {
+    let arr = core::array::from_fn(|_| {
         let inputs: Vec<Input> = inputs.iter().map(|x| (*x).into()).collect();
         inputs
     });
@@ -262,7 +262,7 @@ impl M64File {
 
     pub fn to_bytes(&self) -> Result<ByteVec, M64Error> {
         let active_controllers = active_controllers(self.header.controller_flags)?;
-        let mut sample_bytes: ByteVec = M64File::samples_to_bytes(self, &active_controllers)?;
+        let sample_bytes: ByteVec = M64File::samples_to_bytes(self, &active_controllers)?;
         let mut buffer: ByteVec = vec![0; 0x400 + sample_bytes.len()];
         buffer[0x0..0x4].copy_from_slice(&self.header.signature);
         buffer[0x4..0x8].copy_from_slice(&self.header.version.to_le_bytes());
@@ -307,14 +307,16 @@ impl M64File {
     pub fn replace_inputs(
         &mut self,
         overwrite_range: &Range<usize>,
-        input_range: &Range<usize>,
         replacement_inputs: &Inputs,
     ) -> Result<&mut M64File, M64Error> {
         let active_controllers = active_controllers(self.header.controller_flags)?;
         for i in 0..active_controllers.len() {
-            let end_inputs: Vec<Input> = self.inputs[active_controllers[i]].drain(&overwrite_range.end..).collect();
+            let end_inputs: Vec<Input> = self.inputs[active_controllers[i]]
+                .drain(&overwrite_range.end..)
+                .collect();
             self.inputs[active_controllers[i]].truncate(overwrite_range.start);
-            self.inputs[active_controllers[i]].extend_from_slice(&replacement_inputs[active_controllers[i]]);
+            self.inputs[active_controllers[i]]
+                .extend_from_slice(&replacement_inputs[active_controllers[i]]);
             self.inputs[active_controllers[i]].extend_from_slice(&end_inputs);
         }
         Ok(self)

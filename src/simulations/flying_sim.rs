@@ -12,8 +12,7 @@ pub const fn update_flying_yaw(m: &mut MarioState) {
         } else {
             m.angle_vel[1] = approach_i16(m.angle_vel[1], target_yaw_vel, 0x10, 0x20);
         }
-    }
-    else if target_yaw_vel < 0 {
+    } else if target_yaw_vel < 0 {
         if m.angle_vel[1] > 0 {
             m.angle_vel[1] -= 0x40;
             if m.angle_vel[1] < -0x10 {
@@ -22,8 +21,7 @@ pub const fn update_flying_yaw(m: &mut MarioState) {
         } else {
             m.angle_vel[1] = approach_i16(m.angle_vel[1], target_yaw_vel, 0x20, 0x10);
         }
-    }
-    else if target_yaw_vel == 0 {
+    } else if target_yaw_vel == 0 {
         m.angle_vel[1] = approach_i16(m.angle_vel[1], 0, 0x40, 0x40);
     }
     m.face_angle[1] = m.face_angle[1].wrapping_add(m.angle_vel[1]);
@@ -41,8 +39,7 @@ pub const fn update_flying_pitch(m: &mut MarioState) {
         } else {
             m.angle_vel[0] = approach_i16(m.angle_vel[0], target_pitch_vel, 0x20, 0x40)
         }
-    }
-    else if target_pitch_vel < 0 {
+    } else if target_pitch_vel < 0 {
         if m.angle_vel[0] > 0 {
             m.angle_vel[0] -= 0x40;
             if m.angle_vel[0] < -0x20 {
@@ -51,8 +48,7 @@ pub const fn update_flying_pitch(m: &mut MarioState) {
         } else {
             m.angle_vel[0] = approach_i16(m.angle_vel[0], target_pitch_vel, 0x40, 0x20)
         }
-    }
-    else if target_pitch_vel == 0 {
+    } else if target_pitch_vel == 0 {
         m.angle_vel[0] = approach_i16(m.angle_vel[0], 0, 0x40, 0x40);
     }
 }
@@ -93,14 +89,17 @@ pub const fn perform_air_step(m: &mut MarioState) {
     intended_pos[0] = m.pos[0] + (m.vel[0] / 4.0);
     intended_pos[1] = m.pos[1] + (m.vel[1] / 4.0);
     intended_pos[2] = m.pos[2] + (m.vel[2] / 4.0);
-    intended_pos[0] = intended_pos[0] + (m.vel[0] / 4.0);
-    intended_pos[1] = intended_pos[1] + (m.vel[1] / 4.0);
-    intended_pos[2] = intended_pos[2] + (m.vel[2] / 4.0);
-    intended_pos[0] = intended_pos[0] + (m.vel[0] / 4.0);
-    intended_pos[0] = intended_pos[0] + (m.vel[0] / 4.0);
-    intended_pos[1] = intended_pos[1] + (m.vel[1] / 4.0);
-    intended_pos[2] = intended_pos[2] + (m.vel[2] / 4.0);
-    intended_pos[1] = intended_pos[1] + (m.vel[1] / 4.0);
-    intended_pos[2] = intended_pos[2] + (m.vel[2] / 4.0);
+
+    intended_pos[0] += m.vel[0] / 4.0;
+    intended_pos[1] += m.vel[1] / 4.0;
+    intended_pos[2] += m.vel[2] / 4.0;
+
+    intended_pos[0] += m.vel[0] / 4.0;
+    intended_pos[1] += m.vel[1] / 4.0;
+    intended_pos[2] += m.vel[2] / 4.0;
+
+    intended_pos[0] += m.vel[0] / 4.0;
+    intended_pos[1] += m.vel[1] / 4.0;
+    intended_pos[2] += m.vel[2] / 4.0;
     m.pos = intended_pos;
 }

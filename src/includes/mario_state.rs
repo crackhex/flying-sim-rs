@@ -21,8 +21,8 @@ pub struct Controller {
 
 impl Controller {
     pub fn update_joystick(&mut self, joystick: &i16) {
-        let x = ((joystick >> 8i16) & 0xFF) as i8;
-        let y = (joystick & 0xFF) as i8;
+        let x = ((*joystick >> 8i16) & 0xFF) as i8;
+        let y = (*joystick & 0xFF) as i8;
         self.stick_x = 0.0;
         self.stick_y = 0.0;
         if x <= -8 {

@@ -1,7 +1,7 @@
 use crate::includes::mario_state::MarioState;
 use crate::includes::trig_table::{approach_f32, coss, sins};
 
-pub fn update_air_without_turn(m: &mut MarioState) {
+pub const fn update_air_without_turn(m: &mut MarioState) {
     let mut sideways_speed: f32 = 0.0;
     let mut intended_d_yaw: i16 = 0;
     let mut intended_mag: f32 = 0.0;
